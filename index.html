@@ -996,11 +996,11 @@ async function init() {
       fetchSheet(SHEET_CONFIG.scheduleGid),
     ]);
     if (resources && resources.length > 0) {
-      populateGrids(resources);
-      populateAnnouncements(announcements);
-      populateUpdates(announcements);
-      populateSchedule(schedule);
-    }
+  populateGrids(resources);
+  populateAnnouncements(announcements);
+  populateUpdates(announcements);
+}
+if (schedule && schedule.length > 0) { populateSchedule(schedule); }
   } catch (err) {
     console.error('Sheet load error — showing demo data:', err);
   }
