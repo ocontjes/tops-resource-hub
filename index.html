@@ -950,6 +950,8 @@ function loadDemoData() {
   populateGrids(resources);
   populateAnnouncements(announcements);
   populateUpdates(announcements);
+  
+  if (schedule && schedule.length > 0) { populateSchedule(schedule); }
 }
 // ── Render schedule ───────────────────────────────────────
 function populateSchedule(rows) {
@@ -970,7 +972,7 @@ const d = new Date(dateStr);
     const group = row['Group'] || '';
     const notes = row['Notes'] || '';
     const location = row['Location'] || '';
-    return '<div class="schedule-row"><div class="schedule-date-block"><span class="sd-month">' + month + '</span><span class="sd-day">' + day + '</span><span class="sd-year">' + year + '</span></div><div><div class="schedule-title">' + (row['Title'] || group) + '</div><div class="schedule-time">' + (row['Time'] || '') + '</div>' + (location ? '<div class="schedule-location">📍 ' + location + '</div>' : '') + (notes ? '<div class="schedule-notes">' + notes + '</div>' : '') + '</div>' + (group ? '<span class="schedule-group-tag">' + group + '</span>' : '') + '</div>';
+    return '<div class="schedule-row"><div class="schedule-date-block"><span class="sd-month">' + month + '</span><span class="sd-day">' + day + '</span><span class="sd-year">' + year + '</span></div><div><div class="schedule-title"><strong>' + (row['Title'] || group) + '</strong></div><div class="schedule-time">' + (row['Time'] || '') + '</div>' + (location ? '<div class="schedule-location">📍 ' + location + '</div>' : '') + (notes ? '<div class="schedule-notes">' + notes + '</div>' : '') + '</div>' + (group ? '<span class="schedule-group-tag">' + group + '</span>' : '') + '</div>';
   }).join('');
 }
 // ── Main init ──────────────────────────────────────────────
