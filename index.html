@@ -875,7 +875,10 @@ function toggleMore(hiddenId, btnId, remaining) {
 // ── Render announcements ───────────────────────────────────
 function populateAnnouncements(rows) {
   const wrap = document.getElementById('announce-wrap');
-  const published = rows.filter(r => (r['Status'] || '').toLowerCase() === 'published');
+  const published = rows.filter(r =>
+  (r['Status'] || '').toLowerCase() === 'published' &&
+  (r['Group'] || '').toLowerCase() === 'all'
+);
 
   if (published.length === 0) { wrap.parentElement.style.display = 'none'; return; }
 
