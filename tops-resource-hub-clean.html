@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOPS Resource Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+  /* ─── TOKENS ─────────────────────────────────────────── */
+  :root {
+    --sage:        #7a9e87;
+    --sage-mid:    #5c8470;
+    --sage-light:  #c8dcd0;
+    --sage-pale:   #eef4f1;
+    --warm:        #f5f0e8;
+    --clay:        #c4846a;
+    --clay-light:  #f0d9d0;
+    --plum:        #7b6aaa;
+    --plum-light:  #f0edf8;
+    --amber:       #c4783a;
+    --amber-light: #fef3e8;
+    --ink:         #2c3530;
+    --ink-mid:     #4a5550;
+    --ink-soft:    #8a9490;
+    --white:       #fdfcfb;
+    --border:      rgba(200,220,208,0.5);
+    --radius:      16px;
+    --shadow-sm:   0 2px 8px rgba(44,53,48,0.07);
+    --shadow-md:   0 8px 28px rgba(44,53,48,0.10);
+    --shadow-lg:   0 16px 48px rgba(44,53,48,0.13);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--white);
+    color: var(--ink);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── NAV ─────────────────────────────────────────────── */
+  nav {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(253,252,251,0.94);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    height: 62px;
+    padding: 0 48px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .nav-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.15rem;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none;
+  }
+
+  .nav-logo-dot {
+    width: 8px; height: 8px;
+    background: var(--sage);
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .nav-links {
+    display: flex; gap: 28px; list-style: none; align-items: center;
+  }
+
+  .nav-links a {
+    text-decoration: none;
+    font-size: 0.82rem; font-weight: 500;
+    color: var(--ink-mid);
+    transition: color 0.18s;
+  }
+
+  .nav-links a:hover { color: var(--sage); }
+
+  .nav-submit {
+    background: var(--ink) !important;
+    color: var(--white) !important;
+    padding: 7px 16px !important;
+    border-radius: 100px !important;
+    font-size: 0.78rem !important;
+    font-weight: 600 !important;
+    transition: background 0.18s !important;
+  }
+
+  .nav-submit:hover { background: var(--sage) !important; }
+
+  /* ─── LOADING STATE ───────────────────────────────────── */
+  #loading-screen {
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--white);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 20px;
+    transition: opacity 0.4s ease;
+  }
+
+  #loading-screen.hidden { opacity: 0; pointer-events: none; }
+
+  .loader-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem; color: var(--ink);
+  }
+
+  .loader-logo span { color: var(--sage); }
+
+  .loader-bar {
+    width: 180px; height: 3px;
+    background: var(--sage-light);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+
+  .loader-bar-fill {
+    height: 100%; width: 0%;
+    background: var(--sage);
+    border-radius: 100px;
+    animation: loadfill 1.4s ease forwards;
+  }
+
+  @keyframes loadfill { to { width: 100%; } }
+
+  .loader-text {
+    font-size: 0.75rem; color: var(--ink-soft);
+    letter-spacing: 0.06em;
+  }
+
+  /* ─── HERO ────────────────────────────────────────────── */
+  .hero {
+    max-width: 1080px; margin: 0 auto;
+    padding: 72px 48px 56px;
+    display: grid; grid-template-columns: 1fr 420px; gap: 64px;
+    align-items: center;
+  }
+
+  .hero-eyebrow {
+    font-size: 0.7rem; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--sage); margin-bottom: 14px;
+  }
+
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 3.8vw, 3rem);
+    line-height: 1.14; letter-spacing: -0.025em;
+    color: var(--ink); margin-bottom: 18px;
+  }
+
+  .hero h1 em { font-style: italic; color: var(--sage); }
+
+  .hero-sub {
+    font-size: 0.95rem; line-height: 1.75;
+    color: var(--ink-mid); max-width: 400px; margin-bottom: 28px;
+  }
+
+  .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .btn {
+    border: none; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem; font-weight: 600;
+    padding: 11px 24px; border-radius: 100px;
+    transition: transform 0.15s, background 0.18s, box-shadow 0.18s;
+    text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+  }
+
+  .btn:hover { transform: translateY(-2px); }
+
+  .btn-primary { background: var(--sage); color: white; }
+  .btn-primary:hover { background: var(--sage-mid); box-shadow: 0 6px 20px rgba(122,158,135,0.35); }
+
+  .btn-outline {
+    background: transparent; color: var(--ink);
+    border: 1.5px solid var(--sage-light);
+  }
+
+  .btn-outline:hover { border-color: var(--sage); }
+
+  /* hero floating cards */
+  .hero-visual { position: relative; height: 320px; }
+
+  .hv-card {
+    position: absolute;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    box-shadow: var(--shadow-md);
+    animation: floatcard 4s ease-in-out infinite;
+  }
+
+  .hv-card:nth-child(1) { top: 0; left: 0; width: 195px; animation-delay: 0s; }
+  .hv-card:nth-child(2) { top: 55px; right: 0; width: 210px; animation-delay: 1.3s; }
+  .hv-card:nth-child(3) { bottom: 10px; left: 30px; width: 205px; animation-delay: 0.7s; }
+
+  @keyframes floatcard {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-6px); }
+  }
+
+  .hv-icon {
+    width: 34px; height: 34px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; margin-bottom: 9px;
+  }
+
+  .hv-title { font-size: 0.78rem; font-weight: 600; color: var(--ink); margin-bottom: 3px; }
+  .hv-meta { font-size: 0.68rem; color: var(--ink-soft); }
+
+  .badge {
+    display: inline-block; margin-top: 7px;
+    font-size: 0.6rem; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 100px;
+  }
+
+  /* ─── ANNOUNCE ────────────────────────────────────────── */
+  #announce-section {
+    max-width: 1080px; margin: 0 auto 44px;
+    padding: 0 48px;
+  }
+
+  .announce-wrap { display: flex; flex-direction: column; gap: 10px; }
+
+  .announce-item {
+    background: var(--clay-light);
+    border-left: 3px solid var(--clay);
+    border-radius: 12px;
+    padding: 14px 22px;
+    display: flex; align-items: flex-start; gap: 14px;
+  }
+
+  .announce-tag {
+    background: var(--clay); color: white;
+    font-size: 0.6rem; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 3px 9px; border-radius: 100px;
+    white-space: nowrap; margin-top: 2px;
+  }
+
+  .announce-body { font-size: 0.85rem; color: var(--ink); line-height: 1.55; }
+  .announce-body strong { font-weight: 600; }
+  .announce-date { font-size: 0.72rem; color: var(--ink-soft); margin-top: 3px; }
+
+  /* ─── SECTION SHELL ───────────────────────────────────── */
+  .section {
+    max-width: 1080px; margin: 0 auto;
+    padding: 0 48px 68px;
+    opacity: 0; transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .section.visible { opacity: 1; transform: none; }
+
+  .section-head {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    border-bottom: 1px solid var(--sage-light);
+    padding-bottom: 14px; margin-bottom: 28px;
+  }
+
+  .section-eyebrow {
+    font-size: 0.67rem; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--sage); margin-bottom: 5px;
+  }
+
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem; letter-spacing: -0.02em; color: var(--ink);
+  }
+
+  .section-all {
+    font-size: 0.78rem; font-weight: 600;
+    color: var(--sage); text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.18s;
+  }
+
+  .section-all:hover { color: var(--ink); }
+
+  /* ─── RESOURCE CARDS ──────────────────────────────────── */
+  .card-grid {
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 18px;
+  }
+
+  .resource-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+    cursor: pointer;
+    text-decoration: none;
+    display: flex; flex-direction: column;
+    position: relative; overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .resource-card::after {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 3px; background: var(--sage);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.25s ease;
+  }
+
+  .resource-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+  .resource-card:hover::after { transform: scaleX(1); }
+
+  .rc-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 13px; }
+
+  .rc-icon {
+    width: 42px; height: 42px; border-radius: 11px;
+    display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+  }
+
+  .rc-type-badge {
+    font-size: 0.6rem; font-weight: 700;
+    letter-spacing: 0.07em; text-transform: uppercase;
+    padding: 3px 9px; border-radius: 100px;
+  }
+
+  .rc-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1rem; line-height: 1.3;
+    color: var(--ink); margin-bottom: 7px;
+  }
+
+  .rc-desc {
+    font-size: 0.78rem; line-height: 1.65;
+    color: var(--ink-mid); flex: 1; margin-bottom: 14px;
+  }
+
+  .rc-foot {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .rc-date { font-size: 0.68rem; color: var(--ink-soft); }
+
+  .rc-arrow {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--sage-pale);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.72rem; color: var(--sage);
+    transition: background 0.18s, color 0.18s;
+  }
+
+  .resource-card:hover .rc-arrow { background: var(--sage); color: white; }
+
+  /* category accent variants */
+  .cat-move .rc-icon { background: var(--sage-pale); }
+  .cat-move .rc-type-badge { background: var(--sage-pale); color: var(--sage-mid); }
+  .cat-move::after { background: var(--sage); }
+
+  .cat-food .rc-icon { background: var(--amber-light); }
+  .cat-food .rc-type-badge { background: var(--amber-light); color: var(--amber); }
+  .cat-food::after { background: var(--amber); }
+
+  .cat-mind .rc-icon { background: var(--plum-light); }
+  .cat-mind .rc-type-badge { background: var(--plum-light); color: var(--plum); }
+  .cat-mind::after { background: var(--plum); }
+
+  .cat-community .rc-icon { background: var(--clay-light); }
+  .cat-community .rc-type-badge { background: var(--clay-light); color: var(--clay); }
+  .cat-community::after { background: var(--clay); }
+
+  /* ─── UPDATES ─────────────────────────────────────────── */
+  .updates-list { display: flex; flex-direction: column; gap: 14px; }
+
+  .update-row {
+    background: white; border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px 22px;
+    display: grid; grid-template-columns: 60px 1fr auto;
+    gap: 18px; align-items: center;
+    transition: box-shadow 0.18s;
+  }
+
+  .update-row:hover { box-shadow: var(--shadow-sm); }
+
+  .update-date-block {
+    background: var(--sage-pale); border-radius: 10px;
+    padding: 7px 4px; text-align: center;
+  }
+
+  .ud-month {
+    display: block; font-size: 0.58rem; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--sage);
+  }
+
+  .ud-day {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.35rem; color: var(--ink); line-height: 1;
+  }
+
+  .update-title { font-weight: 600; font-size: 0.88rem; color: var(--ink); margin-bottom: 3px; }
+  .update-desc { font-size: 0.76rem; color: var(--ink-mid); line-height: 1.5; }
+
+  .update-tag {
+    font-size: 0.6rem; font-weight: 700;
+    letter-spacing: 0.07em; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 100px; white-space: nowrap;
+  }
+
+  /* ─── COMMUNITY ───────────────────────────────────────── */
+  .community-panel {
+    background: var(--sage-pale);
+    border: 1px solid var(--sage-light);
+    border-radius: 20px; padding: 44px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 48px;
+    align-items: center;
+  }
+
+  .cp-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.55rem; letter-spacing: -0.02em;
+    color: var(--ink); margin-bottom: 12px;
+  }
+
+  .cp-desc {
+    font-size: 0.85rem; line-height: 1.72;
+    color: var(--ink-mid); margin-bottom: 22px;
+  }
+
+  .cp-steps { display: flex; flex-direction: column; gap: 16px; }
+
+  .cp-step { display: flex; align-items: flex-start; gap: 13px; }
+
+  .cp-num {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--sage); color: white;
+    font-size: 0.72rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+
+  .cp-text { font-size: 0.82rem; line-height: 1.6; color: var(--ink-mid); }
+  .cp-text strong { color: var(--ink); font-weight: 600; }
+
+  /* ─── EMPTY / ERROR STATES ────────────────────────────── */
+  .empty-state {
+    grid-column: 1 / -1;
+    text-align: center; padding: 48px 24px;
+    color: var(--ink-soft); font-size: 0.85rem; line-height: 1.6;
+  }
+
+  .empty-state strong { display: block; font-size: 1rem; color: var(--ink-mid); margin-bottom: 6px; }
+
+  /* ─── SETUP BANNER ────────────────────────────────────── */
+  #setup-notice {
+    background: #fffbea;
+    border: 1.5px dashed #e6c84a;
+    border-radius: 12px;
+    padding: 18px 24px;
+    margin: 0 48px 32px;
+    max-width: 984px;
+    margin-left: auto; margin-right: auto;
+    font-size: 0.82rem; line-height: 1.65; color: #6b5a1a;
+  }
+
+  #setup-notice strong { font-weight: 700; color: #4a3d0d; }
+  #setup-notice code {
+    background: rgba(0,0,0,0.06); padding: 1px 5px;
+    border-radius: 4px; font-size: 0.78rem;
+  }
+
+  /* ─── FOOTER ──────────────────────────────────────────── */
+  footer {
+    background: var(--ink); color: rgba(255,255,255,0.55);
+    padding: 30px 48px; text-align: center;
+    font-size: 0.76rem; line-height: 1.7;
+  }
+
+  footer strong { color: rgba(255,255,255,0.88); }
+
+  /* ─── RESPONSIVE ──────────────────────────────────────── */
+  @media (max-width: 860px) {
+    nav { padding: 0 20px; }
+    .nav-links { display: none; }
+    .hero { grid-template-columns: 1fr; padding: 48px 20px 36px; gap: 40px; }
+    .hero-visual { height: 260px; }
+    .section { padding: 0 20px 52px; }
+    .card-grid { grid-template-columns: 1fr; }
+    .community-panel { grid-template-columns: 1fr; padding: 28px; gap: 28px; }
+    .update-row { grid-template-columns: 50px 1fr; }
+    .update-tag { display: none; }
+    #announce-section { padding: 0 20px; }
+    #setup-notice { margin: 0 20px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="loading-screen" style="display:none;">
+  <div class="loader-logo">TOPS <span>Resource Hub</span></div>
+  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+  <div class="loader-text">Loading resources...</div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">
+    <span class="nav-logo-dot"></span>
+    TOPS Resource Hub
+  </a>
+  <ul class="nav-links">
+    <li><a href="#movement">Movement</a></li>
+    <li><a href="#nutrition">Nutrition</a></li>
+    <li><a href="#wellbeing">Wellbeing</a></li>
+    <li><a href="#updates">Updates</a></li>
+    <li><a href="#community">Community</a></li>
+    <li><a href="#community" class="nav-submit">Submit a Resource</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div>
+    <div class="hero-eyebrow">The Osteoarthritis Prevention Study &mdash; UNC-Chapel Hill</div>
+    <h1>Your <em>wellness</em><br>resources, all<br>in one place.</h1>
+    <p class="hero-sub">Guides, recipes, videos, and tools curated for TOPS participants — organized and easy to find, whenever you need them.</p>
+    <div class="hero-actions">
+      <a href="#movement" class="btn btn-primary">Browse Resources</a>
+      <a href="#community" class="btn btn-outline">Submit Something</a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hv-card">
+      <div class="hv-icon" style="background:var(--sage-pale);">🚶</div>
+      <div class="hv-title">Low-Impact Walking Plan</div>
+      <div class="hv-meta">PDF · Movement</div>
+      <span class="badge" style="background:var(--sage-pale);color:var(--sage);">New</span>
+    </div>
+    <div class="hv-card">
+      <div class="hv-icon" style="background:var(--amber-light);">🥗</div>
+      <div class="hv-title">Anti-Inflammatory Recipes</div>
+      <div class="hv-meta">12 recipes · Nutrition</div>
+      <span class="badge" style="background:var(--amber-light);color:var(--amber);">Popular</span>
+    </div>
+    <div class="hv-card">
+      <div class="hv-icon" style="background:var(--plum-light);">🎧</div>
+      <div class="hv-title">Mindfulness Podcast List</div>
+      <div class="hv-meta">Curated links · Wellbeing</div>
+      <span class="badge" style="background:var(--plum-light);color:var(--plum);">Curated</span>
+    </div>
+  </div>
+</section>
+
+<!-- SETUP NOTICE (shown until sheet is connected) -->
+
+
+<!-- ANNOUNCEMENTS -->
+<div id="announce-section">
+  <div id="announce-wrap" class="announce-wrap"></div>
+</div>
+
+<!-- MOVEMENT -->
+<section class="section visible" id="movement">
+  <div class="section-head">
+    <div>
+      <div class="section-eyebrow">Category 01</div>
+      <div class="section-title">Movement &amp; Exercise</div>
+    </div>
+    <a href="#" class="section-all">View all &rarr;</a>
+  </div>
+  <div class="card-grid" id="grid-movement"><a class="resource-card cat-move" href="https://www.arthritis.org/health-wellness/healthy-living/physical-activity/getting-started/walking-guide" target="_blank" rel="noopener"><div class="rc-top"><div class="rc-icon">🚶</div><span class="rc-type-badge">PDF Guide</span></div><div class="rc-title">Low-Impact Walking Program</div><div class="rc-desc">A 6-week progressive walking plan designed for joint comfort, with modifications for varying mobility levels.</div><div class="rc-foot"><span class="rc-date">Mar 2025</span><div class="rc-arrow">→</div></div></a><a class="resource-card cat-move" href="https://www.youtube.com/results?search_query=seated+strength+training+for+seniors" target="_blank" rel="noopener"><div class="rc-top"><div class="rc-icon">🪑</div><span class="rc-type-badge">Video</span></div><div class="rc-title">Seated Strength Training</div><div class="rc-desc">Three beginner-friendly routines from a chair, targeting the muscles that support the knee joint.</div><div class="rc-foot"><span class="rc-date">Feb 2025</span><div class="rc-arrow">→</div></div></a><a class="resource-card cat-move" href="https://www.arthritis.org" target="_blank" rel="noopener"><div class="rc-top"><div class="rc-icon">🧘</div><span class="rc-type-badge">External Link</span></div><div class="rc-title">Arthritis Foundation Exercise Resources</div><div class="rc-desc">Curated programs including aquatic and tai chi options for all fitness levels.</div><div class="rc-foot"><span class="rc-date">Jan 2025</span><div class="rc-arrow">→</div></div></a></div>
+</section>
+
+<!-- NUTRITION -->
+<section class="section visible" id="nutrition">
+  <div class="section-head">
+    <div>
+      <div class="section-eyebrow">Category 02</div>
+      <div class="section-title">Nutrition &amp; Recipes</div>
+    </div>
+    <a href="#" class="section-all">View all &rarr;</a>
+  </div>
+  <div class="card-grid" id="grid-nutrition"><a class="resource-card cat-food" href="https://curearthritis.org/recipes/" target="_blank" rel="noopener"><div class="rc-top"><div class="rc-icon">🥗</div><span class="rc-type-badge">External Link</span></div><div class="rc-title">Cure Arthritis Recipe Collection</div><div class="rc-desc">Anti-inflammatory recipes curated by the Arthritis National Research Foundation, designed to support joint health.</div><div class="rc-foot"><span class="rc-date">Mar 2026</span><div class="rc-arrow">→</div></div></a><a class="resource-card cat-food" href="#" target="_blank" rel="noopener"><div class="rc-top"><div class="rc-icon">🥬</div><span class="rc-type-badge">PDF Guide</span></div><div class="rc-title">Anti-Inflammatory Eating Basics</div><div class="rc-desc">A one-page visual guide to foods that help manage inflammation and practical swaps for everyday meals.</div><div class="rc-foot"><span class="rc-date">Feb 2025</span><div class="rc-arrow">→</div></div></a><a class="resource-card cat-food" href="https://www.myplate.gov" target="_blank" rel="noopener"><div class="rc-top"><div class="rc-icon">📋</div><span class="rc-type-badge">External Link</span></div><div class="rc-title">MyPlate for Older Adults</div><div class="rc-desc">USDA guidance on balanced eating patterns tailored for adults 65 and older.</div><div class="rc-foot"><span class="rc-date">Jan 2025</span><div class="rc-arrow">→</div></div></a></div>
+</section>
+
+<!-- WELLBEING -->
+<section class="section visible" id="wellbeing">
+  <div class="section-head">
+    <div>
+      <div class="section-eyebrow">Category 03</div>
+      <div class="section-title">Mental Health &amp; Wellbeing</div>
+    </div>
+    <a href="#" class="section-all">View all &rarr;</a>
+  </div>
+  <div class="card-grid" id="grid-wellbeing"><a class="resource-card cat-mind" href="#" target="_blank" rel="noopener"><div class="rc-top"><div class="rc-icon">🎙️</div><span class="rc-type-badge">Podcast List</span></div><div class="rc-title">Podcasts on Aging Well</div><div class="rc-desc">Curated episodes covering sleep, stress, social connection, and navigating chronic conditions with resilience.</div><div class="rc-foot"><span class="rc-date">Mar 2025</span><div class="rc-arrow">→</div></div></a><a class="resource-card cat-mind" href="#" target="_blank" rel="noopener"><div class="rc-top"><div class="rc-icon">📖</div><span class="rc-type-badge">Reading List</span></div><div class="rc-title">Books on Living with Chronic Pain</div><div class="rc-desc">Titles selected for their accessible, practical approach — each with a brief description of what to expect.</div><div class="rc-foot"><span class="rc-date">Feb 2025</span><div class="rc-arrow">→</div></div></a><a class="resource-card cat-mind" href="https://www.niams.nih.gov" target="_blank" rel="noopener"><div class="rc-top"><div class="rc-icon">💬</div><span class="rc-type-badge">External Link</span></div><div class="rc-title">NIAMS Pain Management Resources</div><div class="rc-desc">National Institute guidance on coping strategies for joint pain and chronic conditions.</div><div class="rc-foot"><span class="rc-date">Jan 2025</span><div class="rc-arrow">→</div></div></a></div>
+</section>
+
+<!-- UPDATES -->
+<section class="section visible" id="updates">
+  <div class="section-head">
+    <div>
+      <div class="section-eyebrow">Category 04</div>
+      <div class="section-title">Study Updates &amp; Announcements</div>
+    </div>
+    <a href="#" class="section-all">All updates &rarr;</a>
+  </div>
+  <div class="updates-list" id="list-updates"><div class="update-row"><div class="update-date-block"><span class="ud-month">MAR</span><span class="ud-day">14</span></div><div><div class="update-title">Spring Check-In Visits Now Scheduling</div><div class="update-desc">Your 6-month follow-up includes updated measurements and a brief survey. Appointments available March through May.</div></div><span class="update-tag" style="background:var(--clay-light);color:var(--clay)">Action Needed</span></div><div class="update-row"><div class="update-date-block"><span class="ud-month">FEB</span><span class="ud-day">28</span></div><div><div class="update-title">New Recipes Added to the Nutrition Library</div><div class="update-desc">Eight new anti-inflammatory recipes contributed by participants have been reviewed and added to the hub.</div></div><span class="update-tag" style="background:var(--sage-pale);color:var(--sage)">New Content</span></div></div>
+</section>
+
+<!-- COMMUNITY -->
+<section class="section visible" id="community">
+  <div class="section-head">
+    <div>
+      <div class="section-eyebrow">Category 05</div>
+      <div class="section-title">Community Contributions</div>
+    </div>
+  </div>
+  <div class="community-panel">
+    <div>
+      <div class="cp-title">Have something to share?</div>
+      <p class="cp-desc">If you have found a recipe, article, video, or resource that has helped you, we would love to add it to the hub. Submissions are reviewed by the study team before being posted.</p>
+      <a href="#" class="btn btn-primary" id="submit-btn">Submit a Resource</a>
+    </div>
+    <div class="cp-steps">
+      <div class="cp-step">
+        <div class="cp-num">1</div>
+        <div class="cp-text"><strong>Fill out the short form</strong> — a title, a link or file, and a brief note on why you found it helpful.</div>
+      </div>
+      <div class="cp-step">
+        <div class="cp-num">2</div>
+        <div class="cp-text"><strong>The study team reviews it</strong> — usually within a few business days to confirm it is a good fit for the hub.</div>
+      </div>
+      <div class="cp-step">
+        <div class="cp-num">3</div>
+        <div class="cp-text"><strong>It gets added to the hub</strong> — credited to you by name, or posted anonymously if you prefer.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <strong>TOPS Resource Hub</strong> &mdash; The Osteoarthritis Prevention Study<br>
+  Thurston Arthritis Research Center &middot; UNC-Chapel Hill<br>
+  Questions? Contact the study team at <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="72061d02015f010607160b32071c115c171607">[email&#160;protected]</a></strong>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+/*
+  ══════════════════════════════════════════════════════════
+  TOPS RESOURCE HUB — GOOGLE SHEETS CONFIGURATION
+  ══════════════════════════════════════════════════════════
+
+  STEP 1 — Create your Google Sheet with 3 tabs:
+    Tab 1 "Resources"     — columns: Title | Category | Type | Description | URL | Date Added | Status
+    Tab 2 "Pending"       — same columns (fed by Google Form submissions)
+    Tab 3 "Announcements" — columns: Title | Description | Date | Tag | Status
+
+  STEP 2 — Publish the sheet to the web:
+    In Google Sheets → File → Share → Publish to web
+    Choose "Entire Document" and "CSV" format → Publish
+    (This makes it readable by the site. It does NOT make your sheet editable by anyone.)
+
+  STEP 3 — Find your Sheet ID and tab GIDs:
+    Sheet ID: the long string in your sheet's URL between /d/ and /edit
+    GIDs: click each tab — the number after ?gid= in the URL is that tab's GID
+    Tab 1 (Resources) GID is usually 0
+    Tab 2 (Announcements) GID — check the URL when you click that tab
+
+  STEP 4 — Paste your values below and save the file.
+
+  STEP 5 — Paste your Google Form URL into FORM_URL below
+    so the Submit button links directly to the form.
+
+  STEP 6 — Delete or comment out the #setup-notice div in the HTML
+    once everything is working.
+  ══════════════════════════════════════════════════════════
+*/
+
+const SHEET_CONFIG = {
+  sheetId:           '1u5v7kz5zsPLnjOgY-hZUP8BG4AYJeArQeMMultgnVBg',
+  resourcesGid:      '0',
+  announcementsGid:  '499596198',
+};
+
+const FORM_URL = 'https://forms.gle/obt7mwQxTN6H7ohb6';
+
+// ── Utility ───────────────────────────────────────────────
+// Fetch sheet using raw JSON endpoint — no google object needed
+function fetchSheet(gid) {
+  return new Promise((resolve, reject) => {
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_CONFIG.sheetId}/gviz/tq?tqx=out:json&gid=${gid}`;
+    
+    fetch(url)
+      .then(r => r.text())
+      .then(text => {
+        // Google wraps response in /*O_o*/ google.visualization.Query.setResponse(...)
+        // Strip the wrapper to get pure JSON
+        const json = text.replace(/^.*?\(/, '').replace(/\);?\s*$/, '');
+        const data = JSON.parse(json);
+        const cols = data.table.cols.map(c => c.label);
+        const rows = data.table.rows.map(r => {
+          const obj = {};
+          cols.forEach((col, i) => {
+            obj[col] = (r.c[i] && r.c[i].v != null) ? String(r.c[i].v) : '';
+          });
+          return obj;
+        });
+        resolve(rows);
+      })
+      .catch(reject);
+  });
+}
+
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g,'').trim());
+  return lines.slice(1).map(line => {
+    const vals = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') { inQ = !inQ; }
+      else if (ch === ',' && !inQ) { vals.push(cur.trim()); cur = ''; }
+      else cur += ch;
+    }
+    vals.push(cur.trim());
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = (vals[i] || '').replace(/^"|"$/g,''));
+    return obj;
+  });
+}
+
+// ── Category config ────────────────────────────────────────
+const CAT_MAP = {
+  'movement':  { cls: 'cat-move',      icon: '🚶', label: 'Movement & Exercise' },
+  'nutrition': { cls: 'cat-food',      icon: '🥗', label: 'Nutrition & Recipes' },
+  'wellbeing': { cls: 'cat-mind',      icon: '💬', label: 'Mental Health & Wellbeing' },
+  'community': { cls: 'cat-community', icon: '🤝', label: 'Community' },
+};
+
+function getCat(raw) {
+  const key = (raw || '').toLowerCase().trim();
+  if (key.includes('move') || key.includes('exercise')) return 'movement';
+  if (key.includes('nutri') || key.includes('recipe') || key.includes('food')) return 'nutrition';
+  if (key.includes('well') || key.includes('mental') || key.includes('health')) return 'wellbeing';
+  return 'movement';
+}
+
+function getTypeIcon(type) {
+  const t = (type || '').toLowerCase();
+  if (t.includes('video'))    return '▶';
+  if (t.includes('pdf'))      return '📄';
+  if (t.includes('recipe'))   return '🍽';
+  if (t.includes('podcast'))  return '🎙';
+  if (t.includes('link'))     return '🔗';
+  return '📌';
+}
+
+// ── Render resources ───────────────────────────────────────
+function renderResource(row) {
+  const catKey = getCat(row['Category']);
+  const cfg    = CAT_MAP[catKey] || CAT_MAP['movement'];
+  const url    = row['URL'] || row['Url'] || row['url'] || '#';
+  const date   = row['Date Added'] || row['Date'] || '';
+  const type   = row['Type'] || row['Resource type'] || 'Resource';
+
+  return `
+    <a class="resource-card ${cfg.cls}" href="${url}" target="_blank" rel="noopener">
+      <div class="rc-top">
+        <div class="rc-icon">${getTypeIcon(type)}</div>
+        <span class="rc-type-badge">${type}</span>
+      </div>
+      <div class="rc-title">${row['Title'] || 'Untitled'}</div>
+      <div class="rc-desc">${row['Description'] || row['Short description'] || ''}</div>
+      <div class="rc-foot">
+        <span class="rc-date">${date}</span>
+        <div class="rc-arrow">→</div>
+      </div>
+    </a>`;
+}
+
+function populateGrids(rows) {
+  const published = rows.filter(r => (r['Status'] || '').toLowerCase() === 'published');
+
+  const grids = {
+    movement:  document.getElementById('grid-movement'),
+    nutrition: document.getElementById('grid-nutrition'),
+    wellbeing: document.getElementById('grid-wellbeing'),
+  };
+
+  Object.values(grids).forEach(g => g.innerHTML = '');
+
+  let counts = { movement: 0, nutrition: 0, wellbeing: 0 };
+
+  published.forEach(row => {
+    const cat = getCat(row['Category']);
+    if (grids[cat]) {
+      grids[cat].insertAdjacentHTML('beforeend', renderResource(row));
+      counts[cat]++;
+    }
+  });
+
+  Object.entries(grids).forEach(([key, el]) => {
+    if (counts[key] === 0) {
+      el.innerHTML = `<div class="empty-state"><strong>Coming soon</strong>Resources for this section are being added. Check back soon.</div>`;
+    }
+  });
+}
+
+// ── Render announcements ───────────────────────────────────
+function populateAnnouncements(rows) {
+  const wrap = document.getElementById('announce-wrap');
+  const published = rows.filter(r => (r['Status'] || '').toLowerCase() === 'published');
+
+  if (published.length === 0) { wrap.parentElement.style.display = 'none'; return; }
+
+  wrap.innerHTML = published.map(row => `
+    <div class="announce-item">
+      <span class="announce-tag">${row['Tag'] || 'Update'}</span>
+      <div>
+        <div class="announce-body"><strong>${row['Title'] || ''}</strong> ${row['Description'] || ''}</div>
+        <div class="announce-date">${row['Date'] || ''}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── Render updates section ─────────────────────────────────
+function populateUpdates(rows) {
+  const list = document.getElementById('list-updates');
+  const published = rows.filter(r => (r['Status'] || '').toLowerCase() === 'published');
+
+  if (published.length === 0) {
+    list.innerHTML = `<div class="empty-state"><strong>No updates yet</strong>Study announcements will appear here.</div>`;
+    return;
+  }
+
+  list.innerHTML = published.map(row => {
+    const d = new Date(row['Date'] || '');
+    const month = isNaN(d) ? '—' : d.toLocaleString('default',{month:'short'}).toUpperCase();
+    const day   = isNaN(d) ? '—' : d.getDate();
+    const tag   = row['Tag'] || 'Update';
+    const tagStyle = tag.toLowerCase().includes('action')
+      ? `background:var(--clay-light);color:var(--clay)`
+      : `background:var(--sage-pale);color:var(--sage)`;
+
+    return `
+      <div class="update-row">
+        <div class="update-date-block">
+          <span class="ud-month">${month}</span>
+          <span class="ud-day">${day}</span>
+        </div>
+        <div>
+          <div class="update-title">${row['Title'] || ''}</div>
+          <div class="update-desc">${row['Description'] || ''}</div>
+        </div>
+        <span class="update-tag" style="${tagStyle}">${tag}</span>
+      </div>`;
+  }).join('');
+}
+
+// ── Scroll reveal ──────────────────────────────────────────
+function initReveal() {
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.07 });
+  document.querySelectorAll('.section').forEach(s => obs.observe(s));
+}
+
+// ── Submit button ──────────────────────────────────────────
+function initSubmitBtn() {
+  const btn = document.getElementById('submit-btn');
+  if (FORM_URL && FORM_URL !== 'YOUR_GOOGLE_FORM_URL_HERE') {
+    btn.href = FORM_URL;
+    btn.target = '_blank';
+    btn.rel = 'noopener';
+  } else {
+    btn.addEventListener('click', e => {
+      e.preventDefault();
+      alert('Submission form coming soon. Contact the study team at tops-study@unc.edu to submit a resource.');
+    });
+  }
+}
+
+// ── Demo mode (when sheet not yet connected) ───────────────
+function loadDemoData() {
+  const resources = [
+    { Title:'Low-Impact Walking Program', Category:'Movement', Type:'PDF Guide', 'Short description':'A 6-week progressive walking plan designed for joint comfort, with modifications for varying mobility levels.', URL:'#', 'Date Added':'Mar 2025', Status:'Published' },
+    { Title:'Seated Strength Training', Category:'Movement', Type:'Video', 'Short description':'Three beginner-friendly routines from a chair, targeting the muscles that support the knee joint.', URL:'#', 'Date Added':'Feb 2025', Status:'Published' },
+    { Title:'Arthritis Foundation Exercise Resources', Category:'Movement', Type:'External Link', 'Short description':'Curated programs including aquatic and tai chi options for all fitness levels.', URL:'https://www.arthritis.org', 'Date Added':'Jan 2025', Status:'Published' },
+    { Title:'Baked Salmon with Turmeric', Category:'Nutrition', Type:'Recipe', 'Short description':'A simple anti-inflammatory dinner with omega-3 rich salmon and a turmeric-ginger glaze. Ready in 30 minutes.', URL:'#', 'Date Added':'Mar 2025', Status:'Published' },
+    { Title:'Anti-Inflammatory Eating Basics', Category:'Nutrition', Type:'PDF Guide', 'Short description':'A one-page visual guide to foods that help manage inflammation and practical swaps for everyday meals.', URL:'#', 'Date Added':'Feb 2025', Status:'Published' },
+    { Title:'MyPlate for Older Adults', Category:'Nutrition', Type:'External Link', 'Short description':'USDA guidance on balanced eating patterns tailored for adults 65 and older.', URL:'https://www.myplate.gov', 'Date Added':'Jan 2025', Status:'Published' },
+    { Title:'Podcasts on Aging Well', Category:'Wellbeing', Type:'Podcast List', 'Short description':'Curated episodes covering sleep, stress, social connection, and navigating chronic conditions with resilience.', URL:'#', 'Date Added':'Mar 2025', Status:'Published' },
+    { Title:'Books on Living with Chronic Pain', Category:'Wellbeing', Type:'Reading List', 'Short description':'Titles selected for their accessible, practical approach — each with a brief description of what to expect.', URL:'#', 'Date Added':'Feb 2025', Status:'Published' },
+    { Title:'NIAMS Pain Management Resources', Category:'Wellbeing', Type:'External Link', 'Short description':'National Institute guidance on coping strategies for joint pain and chronic conditions.', URL:'https://www.niams.nih.gov', 'Date Added':'Jan 2025', Status:'Published' },
+  ];
+
+  const announcements = [
+    { Title:'Spring Check-In Visits Now Scheduling', Description:'Your 6-month follow-up includes updated measurements and a brief survey. Appointments available March through May.', Date:'2025-03-14', Tag:'Action Needed', Status:'Published' },
+    { Title:'New Recipes Added to the Nutrition Library', Description:'Eight new anti-inflammatory recipes contributed by participants have been reviewed and added to the hub.', Date:'2025-02-28', Tag:'New Content', Status:'Published' },
+  ];
+
+  populateGrids(resources);
+  populateAnnouncements(announcements);
+  populateUpdates(announcements);
+}
+
+// ── Main init ──────────────────────────────────────────────
+async function init() {
+  initReveal();
+  initSubmitBtn();
+
+  // Always load demo data first — site is never blank
+  loadDemoData();
+  document.getElementById('loading-screen').classList.add('hidden');
+
+  // Hide setup notice
+  const notice = document.getElementById('setup-notice');
+  if (notice) notice.style.display = 'none';
+
+  // Try to load real sheet data on top of demo data
+  try {
+    const [resources, announcements] = await Promise.all([
+      fetchSheet(SHEET_CONFIG.resourcesGid),
+      fetchSheet(SHEET_CONFIG.announcementsGid),
+    ]);
+    if (resources && resources.length > 0) {
+      populateGrids(resources);
+      populateAnnouncements(announcements);
+      populateUpdates(announcements);
+    }
+  } catch (err) {
+    console.error('Sheet load error — showing demo data:', err);
+  }
+}
+window.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.section').forEach(function(s) { s.classList.add('visible'); });
+  init();
+});
+</script>
+</body>
+</html>
