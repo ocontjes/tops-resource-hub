@@ -703,7 +703,7 @@ const FORM_URL = 'https://forms.gle/obt7mwQxTN6H7ohb6';
 // Fetch sheet using raw JSON endpoint — no google object needed
 function fetchSheet(gid) {
   return new Promise((resolve, reject) => {
-    const url = `https://docs.google.com/spreadsheets/d/${SHEET_CONFIG.sheetId}/gviz/tq?tqx=out:json&gid=${gid}`;
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_CONFIG.sheetId}/gviz/tq?tqx=out:json&gid=${gid}&headers=1`;
     
     fetch(url)
       .then(r => r.text())
