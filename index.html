@@ -515,6 +515,7 @@
     <li><a href="#nutrition">Nutrition</a></li>
     <li><a href="#wellbeing">Wellbeing</a></li>
     <li><a href="#updates">Updates</a></li>
+    <li><a href="#schedule">Schedule</a></li>
     <li><a href="#community">Community</a></li>
     <li><a href="#community" class="nav-submit">Submit a Resource</a></li>
   </ul>
@@ -608,7 +609,18 @@
   </div>
   <div class="updates-list" id="list-updates"><div class="update-row"><div class="update-date-block"><span class="ud-month">MAR</span><span class="ud-day">14</span></div><div><div class="update-title">Spring Check-In Visits Now Scheduling</div><div class="update-desc">Your 6-month follow-up includes updated measurements and a brief survey. Appointments available March through May.</div></div><span class="update-tag" style="background:var(--clay-light);color:var(--clay)">Action Needed</span></div><div class="update-row"><div class="update-date-block"><span class="ud-month">FEB</span><span class="ud-day">28</span></div><div><div class="update-title">New Recipes Added to the Nutrition Library</div><div class="update-desc">Eight new anti-inflammatory recipes contributed by participants have been reviewed and added to the hub.</div></div><span class="update-tag" style="background:var(--sage-pale);color:var(--sage)">New Content</span></div></div>
 </section>
-
+<!-- SCHEDULE -->
+<section class="section visible" id="schedule">
+  <div class="section-head">
+    <div>
+      <div class="section-eyebrow">Category 05</div>
+      <div class="section-title">Group Meeting Schedule</div>
+    </div>
+  </div>
+  <div class="schedule-list" id="list-schedule">
+    <div class="empty-state"><strong>Schedule coming soon</strong>Meeting dates will appear here once published.</div>
+  </div>
+</section>
 <!-- COMMUNITY -->
 <section class="section visible" id="community">
   <div class="section-head">
@@ -682,6 +694,7 @@ const SHEET_CONFIG = {
   sheetId:           '1u5v7kz5zsPLnjOgY-hZUP8BG4AYJeArQeMMultgnVBg',
   resourcesGid:      '0',
   announcementsGid:  '499596198',
+  scheduleGid:       '1677447145',
 };
 
 const FORM_URL = 'https://forms.gle/obt7mwQxTN6H7ohb6';
@@ -908,7 +921,26 @@ function loadDemoData() {
   populateAnnouncements(announcements);
   populateUpdates(announcements);
 }
-
+// ── Render schedule ───────────────────────────────────────
+function populateSchedule(rows) {
+  const list = document.getElementById('list-schedule');
+  if (!list) return;
+  const published = rows.filter(r => (r['Status'] || '').toLowerCase() === 'published');
+  if (published.length === 0) {
+    list.innerHTML = '<div class="empty-state"><strong>Schedule coming soon</strong>Meeting dates will appear here once published.</div>';
+    return;
+  }
+  list.innerHTML = published.map(row => {
+    const d = new Date(row['Date'] || '');
+    const month = isNaN(d) ? '—' : d.toLocaleString('default', { month: 'short' }).toUpperCase();
+    const day = isNaN(d) ? '—' : d.getDate();
+    const year = isNaN(d) ? '' : d.getFullYear();
+    const group = row['Group'] || '';
+    const notes = row['Notes'] || '';
+    const location = row['Location'] || '';
+    return '<div class="schedule-row"><div class="schedule-date-block"><span class="sd-month">' + month + '</span><span class="sd-day">' + day + '</span><span class="sd-year">' + year + '</span></div><div><div class="schedule-title">' + (row['Title'] || group) + '</div><div class="schedule-time">' + (row['Time'] || '') + '</div>' + (location ? '<div class="schedule-location">📍 ' + location + '</div>' : '') + (notes ? '<div class="schedule-notes">' + notes + '</div>' : '') + '</div>' + (group ? '<span class="schedule-group-tag">' + group + '</span>' : '') + '</div>';
+  }).join('');
+}
 // ── Main init ──────────────────────────────────────────────
 async function init() {
   initReveal();
@@ -924,14 +956,16 @@ async function init() {
 
   // Try to load real sheet data on top of demo data
   try {
-    const [resources, announcements] = await Promise.all([
+    const [resources, announcements, schedule] = await Promise.all([
       fetchSheet(SHEET_CONFIG.resourcesGid),
       fetchSheet(SHEET_CONFIG.announcementsGid),
+      fetchSheet(SHEET_CONFIG.scheduleGid),
     ]);
     if (resources && resources.length > 0) {
       populateGrids(resources);
       populateAnnouncements(announcements);
       populateUpdates(announcements);
+      populateSchedule(schedule);
     }
   } catch (err) {
     console.error('Sheet load error — showing demo data:', err);
