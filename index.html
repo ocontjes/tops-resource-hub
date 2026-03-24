@@ -891,10 +891,12 @@ function populateUpdates(rows) {
   }
 
   list.innerHTML = published.map(row => {
-    const d = new Date(row['Date'] || '');
-    const month = isNaN(d) ? '—' : d.toLocaleString('default',{month:'short'}).toUpperCase();
-    const day   = isNaN(d) ? '—' : d.getDate();
+    const d = new Date(row['Event Date'] || '');
+const hasDate = row['Event Date'] && row['Event Date'].trim() !== '' && !isNaN(d);
+    const month = hasDate ? d.toLocaleString('default',{month:'short'}).toUpperCase() : '';
+const day = hasDate ? d.getDate() : '';
     const tag   = row['Tag'] || 'Update';
+    const tagIcon = tag.toLowerCase().includes('action') ? '🔔' : tag.toLowerCase().includes('new content') ? '✨' : tag.toLowerCase().includes('newsletter') ? '📬' : tag.toLowerCase().includes('event') ? '📅' : tag.toLowerCase().includes('reminder') ? '⏰' : '📢';
     const tagStyle = tag.toLowerCase().includes('action')
       ? `background:var(--clay-light);color:var(--clay)`
       : `background:var(--sage-pale);color:var(--sage)`;
@@ -902,9 +904,8 @@ function populateUpdates(rows) {
     return `
       <div class="update-row">
         <div class="update-date-block">
-          <span class="ud-month">${month}</span>
-          <span class="ud-day">${day}</span>
-        </div>
+  ${hasDate ? `<span class="ud-month">${month}</span><span class="ud-day">${day}</span>` : `<span style="font-size:1.4rem">${tagIcon}</span>`}
+</div>
         <div>
           <div class="update-title">${row['Title'] || ''}</div>
           <div class="update-desc">${row['Description'] || ''}</div>
