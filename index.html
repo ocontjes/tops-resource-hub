@@ -908,7 +908,7 @@ const hasDate = row['Event Date'] && row['Event Date'].trim() !== '' && !isNaN(d
     const month = hasDate ? d.toLocaleString('default',{month:'short'}).toUpperCase() : '';
 const day = hasDate ? d.getDate() : '';
     const tag   = row['Tag'] || 'Update';
-    const tagIcon = tag.toLowerCase().includes('action') ? '🔔' : tag.toLowerCase().includes('new content') ? '✨' : tag.toLowerCase().includes('newsletter') ? '📬' : tag.toLowerCase().includes('event') ? '📅' : tag.toLowerCase().includes('reminder') ? '⏰' : '📢';
+const tagIcon = tag.toLowerCase().includes('action') ? '🔔' : tag.toLowerCase().includes('new content') ? '✨' : tag.toLowerCase().includes('newsletter') ? '📬' : tag.toLowerCase().includes('event') ? '📌' : tag.toLowerCase().includes('reminder') ? '⏰' : '📢';
     const tagStyle = tag.toLowerCase().includes('action')
       ? `background:var(--clay-light);color:var(--clay)`
       : `background:var(--sage-pale);color:var(--sage)`;
