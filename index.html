@@ -881,6 +881,7 @@ function populateAnnouncements(rows) {
 );
 console.log('Announcements rows:', rows);
   console.log('Published filtered:', published);
+  wrap.parentElement.style.display = '';
   if (published.length === 0) { wrap.parentElement.style.display = 'none'; return; }
 
   wrap.innerHTML = published.map(row => `
