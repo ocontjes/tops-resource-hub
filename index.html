@@ -961,7 +961,9 @@ function populateSchedule(rows) {
     return;
   }
   list.innerHTML = published.map(row => {
-    const d = new Date(row['Date'] || '');
+    let dateStr = row['Date'] || '';
+if (dateStr.startsWith('Date(')) { const parts = dateStr.replace('Date(','').replace(')','').split(','); dateStr = parts[0] + '-' + String(parseInt(parts[1])+1).padStart(2,'0') + '-' + String(parts[2]).padStart(2,'0'); }
+const d = new Date(dateStr);
     const month = isNaN(d) ? '—' : d.toLocaleString('default', { month: 'short' }).toUpperCase();
     const day = isNaN(d) ? '—' : d.getDate();
     const year = isNaN(d) ? '' : d.getFullYear();
