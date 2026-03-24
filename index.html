@@ -766,11 +766,19 @@ function getCat(raw) {
 
 function getTypeIcon(type) {
   const t = (type || '').toLowerCase();
-  if (t.includes('video'))    return '▶';
-  if (t.includes('pdf'))      return '📄';
-  if (t.includes('recipe'))   return '🍽';
-  if (t.includes('podcast'))  return '🎙';
-  if (t.includes('link'))     return '🔗';
+  if (t.includes('recipe'))    return '🍽';
+  if (t.includes('video'))     return '▶';
+  if (t.includes('website'))   return '🌐';
+  if (t.includes('podcast list')) return '🎧';
+  if (t.includes('podcast'))   return '🎙';
+  if (t.includes('reading list')) return '📚';
+  if (t.includes('book'))      return '📖';
+  if (t.includes('article'))   return '📰';
+  if (t.includes('workout'))   return '🏃';
+  if (t.includes('nutrition')) return '🥗';
+  if (t.includes('pdf'))       return '📄';
+  if (t.includes('infographic')) return '📊';
+if (t.includes('app'))         return '📱';
   return '📌';
 }
 
