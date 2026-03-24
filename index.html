@@ -798,30 +798,58 @@ function renderResource(row) {
 
 function populateGrids(rows) {
   const published = rows.filter(r => (r['Status'] || '').toLowerCase() === 'published');
-
-  const grids = {
+  const categories = {
     movement:  document.getElementById('grid-movement'),
     nutrition: document.getElementById('grid-nutrition'),
     wellbeing: document.getElementById('grid-wellbeing'),
   };
-
-  Object.values(grids).forEach(g => g.innerHTML = '');
-
-  let counts = { movement: 0, nutrition: 0, wellbeing: 0 };
-
+  const grouped = { movement: [], nutrition: [], wellbeing: [] };
   published.forEach(row => {
     const cat = getCat(row['Category']);
-    if (grids[cat]) {
-      grids[cat].insertAdjacentHTML('beforeend', renderResource(row));
-      counts[cat]++;
+    if (grouped[cat]) grouped[cat].push(row);
+  });
+  Object.entries(categories).forEach(([key, grid]) => {
+    if (!grid) return;
+    grid.innerHTML = '';
+    const items = grouped[key];
+    if (items.length === 0) {
+      grid.innerHTML = '<div class="empty-state"><strong>Coming soon</strong>Resources for this section are being added. Check back soon.</div>';
+      return;
+    }
+    items.slice(0, 3).forEach(row => {
+      grid.insertAdjacentHTML('beforeend', renderResource(row));
+    });
+    if (items.length > 3) {
+      const hiddenId = 'hidden-' + key;
+      const btnId = 'btn-' + key;
+      const hiddenDiv = document.createElement('div');
+      hiddenDiv.id = hiddenId;
+      hiddenDiv.style.display = 'none';
+      hiddenDiv.style.cssText = 'display:none; grid-column: 1 / -1;';
+      items.slice(3).forEach(row => {
+        hiddenDiv.insertAdjacentHTML('beforeend', renderResource(row));
+      });
+      grid.appendChild(hiddenDiv);
+      const remaining = items.length - 3;
+      const btnWrap = document.createElement('div');
+      btnWrap.style.cssText = 'grid-column: 1 / -1; text-align: center; padding-top: 8px;';
+      btnWrap.innerHTML = '<button id="' + btnId + '" onclick="toggleMore(\'' + hiddenId + '\', \'' + btnId + '\', ' + remaining + ')" style="background:transparent; border:1.5px solid var(--sage-light); color:var(--ink); padding:10px 24px; border-radius:100px; font-family:inherit; font-size:0.85rem; font-weight:600; cursor:pointer;">Show ' + remaining + ' more</button>';
+      grid.appendChild(btnWrap);
     }
   });
+}
 
-  Object.entries(grids).forEach(([key, el]) => {
-    if (counts[key] === 0) {
-      el.innerHTML = `<div class="empty-state"><strong>Coming soon</strong>Resources for this section are being added. Check back soon.</div>`;
-    }
-  });
+function toggleMore(hiddenId, btnId, remaining) {
+  const hidden = document.getElementById(hiddenId);
+  const btn = document.getElementById(btnId);
+  if (!hidden || !btn) return;
+  if (hidden.style.display === 'none') {
+    hidden.style.display = 'contents';
+    btn.textContent = 'Show less';
+  } else {
+    hidden.style.display = 'none';
+    btn.textContent = 'Show ' + remaining + ' more';
+  }
 }
 
 // ── Render announcements ───────────────────────────────────
