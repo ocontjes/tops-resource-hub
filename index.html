@@ -879,8 +879,7 @@ function populateAnnouncements(rows) {
   (r['Status'] || '').toLowerCase() === 'published' &&
   (r['Group'] || '').toLowerCase() === 'all'
 );
-console.log('Announcements rows:', rows);
-  console.log('Published filtered:', published);
+
   wrap.parentElement.style.display = '';
   if (published.length === 0) { wrap.parentElement.style.display = 'none'; return; }
 
