@@ -825,7 +825,9 @@ function populateGrids(rows) {
       const hiddenDiv = document.createElement('div');
       hiddenDiv.id = hiddenId;
       hiddenDiv.style.display = 'none';
-      hiddenDiv.style.cssText = 'display:none; grid-column: 1 / -1;';
+      hiddenDiv.style.cssText = 'display:none;';
+hiddenDiv.classList.add('card-grid');
+hiddenDiv.style.marginTop = '18px';
       items.slice(3).forEach(row => {
         hiddenDiv.insertAdjacentHTML('beforeend', renderResource(row));
       });
