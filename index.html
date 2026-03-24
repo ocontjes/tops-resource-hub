@@ -696,7 +696,7 @@ function fetchSheet(gid) {
       .then(r => r.text())
       .then(text => {
         // Google wraps response in /*O_o*/ google.visualization.Query.setResponse(...)
-        Strip everything before first { and after last }
+        //Strip everything before first { and after last }
         const start = text.indexOf('{');
         const end = text.lastIndexOf('}');
         const json = text.substring(start, end + 1);
