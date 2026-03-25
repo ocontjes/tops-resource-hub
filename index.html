@@ -503,8 +503,18 @@
 
   footer strong { color: rgba(255,255,255,0.88); }
 
-  .schedule-list{display:flex;flex-direction:column;gap:12px}.schedule-row{background:white;border:1px solid var(--border);border-radius:12px;padding:18px 24px;display:grid;grid-template-columns:90px 1fr auto;gap:20px;align-items:center}.schedule-date-block{background:var(--sage-pale);border-radius:10px;padding:8px 6px;text-align:center}.sd-month{display:block;font-size:0.58rem;font-weight:700;text-transform:uppercase;color:var(--sage)}.sd-day{font-family:'DM Serif Display',serif;font-size:1.35rem;color:var(--ink);line-height:1;display:block}.sd-year{display:block;font-size:0.6rem;color:var(--ink-soft)}.schedule-title{font-weight:600;font-size:0.9rem;color:var(--ink)}.schedule-time{font-size:0.78rem;color:var(--sage);font-weight:500}.schedule-location{font-size:0.75rem;color:var(--ink-mid)}.schedule-notes{font-size:0.72rem;color:var(--ink-soft);font-style:italic}.schedule-group-tag{font-size:0.6rem;font-weight:700;text-transform:uppercase;padding:4px 10px;border-radius:100px;background:var(--sage-pale);color:var(--sage)}
-  /* ─── RESPONSIVE ──────────────────────────────────────── */
+  .schedule-list { display:flex; flex-direction:column; gap:12px; }
+.schedule-row {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 24px;
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+  /* ─── RESPONSIVE */
   @media (max-width: 860px) {
     nav { padding: 0 20px; }
     .nav-links { display: none; }
@@ -1031,40 +1041,81 @@ function populateUpdates(rows) {
 function populateSchedule(rows) {
   const list = document.getElementById('list-schedule');
   if (!list) return;
-  const published = rows.filter(r => (r['Status'] || '').toLowerCase() === 'published');
-  if (published.length === 0) {
-    list.innerHTML = '<div class="empty-state"><strong>Schedule coming soon</strong>Meeting dates will appear here once published.</div>';
-    return;
-  }
-  list.innerHTML = published.map(row => {
-    let dateStr = row['Date'] || '';
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const LOCATION_STYLES = {
+    'chapel hill / durham': { bg: '#ddedf7', color: '#3a7ca5' },
+    'raleigh':              { bg: '#fde8e8', color: '#c0444d' },
+    'all sites':            { bg: 'var(--sage-pale)', color: 'var(--sage)' },
+    'virtual':              { bg: 'var(--plum-light)', color: 'var(--plum)' },
+  };
+
+  const published = rows.filter(r => {
+    if ((r['Status'] || '').toLowerCase() !== 'published') return false;
+    let dateStr = r['Date'] || '';
     if (dateStr.startsWith('Date(')) {
       const parts = dateStr.replace('Date(','').replace(')','').split(',');
       dateStr = parts[0] + '-' + String(parseInt(parts[1])+1).padStart(2,'0') + '-' + String(parts[2]).padStart(2,'0');
     }
-    const d     = new Date(dateStr + 'T12:00:00');
-    const month = isNaN(d) ? '—' : d.toLocaleString('default', { month: 'short' }).toUpperCase();
-    const day   = isNaN(d) ? '—' : d.getDate();
-    const year  = isNaN(d) ? '' : d.getFullYear();
-    const group    = row['Group'] || '';
-    const notes    = row['Notes'] || '';
-    const location = row['Location'] || '';
-    return `
-      <div class="schedule-row">
-        <div class="schedule-date-block">
-          <span class="sd-month">${month}</span>
-          <span class="sd-day">${day}</span>
-          <span class="sd-year">${year}</span>
-        </div>
-        <div>
-          <div class="schedule-title"><strong>${row['Title'] || group}</strong></div>
-          <div class="schedule-time">${row['Time'] || ''}</div>
-          ${location ? `<div class="schedule-location">📍 ${location}</div>` : ''}
-          ${notes    ? `<div class="schedule-notes">${notes}</div>` : ''}
-        </div>
-        ${group ? `<span class="schedule-group-tag">${group}</span>` : ''}
-      </div>`;
-  }).join('');
+    const d = new Date(dateStr + 'T12:00:00');
+    return !isNaN(d) && d >= today;
+  });
+
+  if (published.length === 0) {
+    list.innerHTML = '<div class="empty-state"><strong>No upcoming meetings</strong>Check back soon for scheduled dates.</div>';
+  } else {
+    list.innerHTML = published.map(row => {
+      let dateStr = row['Date'] || '';
+      if (dateStr.startsWith('Date(')) {
+        const parts = dateStr.replace('Date(','').replace(')','').split(',');
+        dateStr = parts[0] + '-' + String(parseInt(parts[1])+1).padStart(2,'0') + '-' + String(parts[2]).padStart(2,'0');
+      }
+      const d        = new Date(dateStr + 'T12:00:00');
+      const month    = isNaN(d) ? '—' : d.toLocaleString('default', { month: 'short' }).toUpperCase();
+      const day      = isNaN(d) ? '—' : d.getDate();
+      const year     = isNaN(d) ? '' : d.getFullYear();
+      const location = (row['Location'] || '').trim();
+      const address  = (row['Address'] || '').trim();
+      const groups   = (row['Groups'] || '').trim();
+      const time     = (row['Time'] || '').trim();
+      const title    = (row['Title'] || '').trim();
+      const notes    = (row['Notes'] || '').trim();
+      const zoom     = (row['Zoom'] || '').trim().toLowerCase() === 'yes';
+      const locStyle = LOCATION_STYLES[location.toLowerCase()] || null;
+
+      const locationTag = locStyle
+        ? `<span style="background:${locStyle.bg}; color:${locStyle.color}; font-size:0.62rem; font-weight:700; letter-spacing:0.07em; text-transform:uppercase; padding:3px 10px; border-radius:100px; white-space:nowrap;">📍 ${location}</span>`
+        : '';
+
+      return `
+        <div class="schedule-row">
+          <div class="schedule-date-block">
+            <span class="sd-month">${month}</span>
+            <span class="sd-day">${day}</span>
+            <span class="sd-year">${year}</span>
+          </div>
+          <div style="flex:1;">
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:5px;">
+              ${locationTag}
+              ${groups ? `<span style="font-size:0.72rem; font-weight:600; color:var(--ink-mid);">${groups}</span>` : ''}
+            </div>
+            ${title ? `<div class="schedule-title"><strong>${title}</strong></div>` : ''}
+            ${time ? `<div class="schedule-time">🗓️ ${time}</div>` : ''}
+            ${address ? `<div class="schedule-location" style="font-size:0.72rem; color:var(--ink-soft); margin-top:3px;">📍 ${address}</div>` : ''}
+            ${notes ? `<div class="schedule-notes">${notes}</div>` : ''}
+            ${zoom ? `<div style="font-size:0.68rem; color:var(--ink-soft); margin-top:4px; font-style:italic;">Virtual option available upon request</div>` : ''}
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // Subtle calendar link
+  const calWrap = document.createElement('div');
+  calWrap.style.cssText = 'text-align:right; margin-top:14px;';
+  calWrap.innerHTML = `<a href="https://calendar.google.com/calendar/embed?src=76085ac8d1dd6f66236701ac78e0592dc3ca16b13525140405459135f899de68%40group.calendar.google.com&ctz=America%2FNew_York" target="_blank" rel="noopener" style="font-size:0.78rem; color:var(--sage); font-weight:600; text-decoration:none;">View full calendar →</a>`;
+  list.parentElement.appendChild(calWrap);
 }
 
 // ── Demo fallback ──────────────────────────────────────────
