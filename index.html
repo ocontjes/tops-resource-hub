@@ -318,7 +318,7 @@
 
   .rc-icon {
     width: 42px; height: 42px; border-radius: 11px;
-    display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+    display: flex; align-items: center; justify-content: center; font-size: 1.6rem;
   }
 
   .rc-type-badge {
@@ -810,7 +810,7 @@ if (rawDate.startsWith('Date(')) {
   return `
     <a class="resource-card ${cfg.cls}" href="${url}" target="_blank" rel="noopener">
       <div class="rc-top">
-        <div class="rc-icon">${getTypeIcon(type)}</div>
+        <div class="rc-icon">${getTypeIcon(type, tag1)}</div>
         <span class="rc-type-badge">${type}</span>
       </div>
       <div class="rc-title">${row['Title'] || 'Untitled'}</div>
