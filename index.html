@@ -1064,6 +1064,12 @@ function populateSchedule(rows) {
     return !isNaN(d) && d >= today && d < nextMonth;
   });
 
+  published.sort((a, b) => {
+    const dateA = new Date((a['Date'] || '') + 'T12:00:00');
+    const dateB = new Date((b['Date'] || '') + 'T12:00:00');
+    return dateA - dateB;
+  });
+  
   if (published.length === 0) {
     list.innerHTML = '<div class="empty-state"><strong>No upcoming meetings</strong>Check back soon for scheduled dates.</div>';
   } else {
