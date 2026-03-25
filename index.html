@@ -968,32 +968,18 @@ function populateGrids(rows) {
             viewAllLink.textContent = 'View all →';
           }
         };
+      const viewAllLinkCheck = document.querySelector(`#${key} .section-all`);
+        if (viewAllLinkCheck && items.length <= 3) {
+          viewAllLinkCheck.style.display = 'none';
+        }
       }
 
     // Render filter bar if more than one tag
     if (tagSet.size > 1) {
       renderFilterBar(key, [...tagSet], 'grid-' + key);
     }
-      const viewAllLinkCheck = document.querySelector(`#${key} .section-all`);
-    if (viewAllLinkCheck && items.length <= 3) {
-      viewAllLinkCheck.style.display = 'none';
-    }
   });
 }
-
-function toggleMore(hiddenId, btnId, remaining) {
-  const hidden = document.getElementById(hiddenId);
-  const btn    = document.getElementById(btnId);
-  if (!hidden || !btn) return;
-  if (hidden.style.display === 'none') {
-    hidden.style.display = 'contents';
-    btn.textContent = 'Show less';
-  } else {
-    hidden.style.display = 'none';
-    btn.textContent = 'Show ' + remaining + ' more';
-  }
-}
-
 // ── Announcements ──────────────────────────────────────────
 function populateAnnouncements(rows) {
   const wrap = document.getElementById('announce-wrap');
