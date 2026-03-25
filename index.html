@@ -509,10 +509,6 @@
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 18px 24px;
-  display: grid;
-  grid-template-columns: 90px 1fr;
-  gap: 20px;
-  align-items: start;
 }
   /* ─── RESPONSIVE */
   @media (max-width: 860px) {
@@ -1106,19 +1102,21 @@ function populateSchedule(rows) {
 
       return `
         <div class="schedule-row">
-          <div class="schedule-date-block">
-            <span class="sd-month">${month}</span>
-            <span class="sd-day">${day}</span>
-            <span class="sd-year">${year}</span>
-          </div>
-          <div style="flex:1;">
-            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:5px;">
-              ${locationTag}
-              ${groups ? `<span style="font-size:0.72rem; font-weight:600; color:var(--ink-mid);">${groups}</span>` : ''}
+          <div style="display:grid; grid-template-columns:90px 1fr; gap:20px; align-items:center;">
+            <div class="schedule-date-block">
+              <span class="sd-month">${month}</span>
+              <span class="sd-day">${day}</span>
+              <span class="sd-year">${year}</span>
             </div>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              ${locationTag}
+              ${groups ? `<span style="font-size:0.82rem; font-weight:600; color:var(--ink-mid);">${groups}</span>` : ''}
+            </div>
+          </div>
+          <div style="margin-top:12px;">
             ${title ? `<div class="schedule-title"><strong>${title}</strong></div>` : ''}
             ${time ? `<div class="schedule-time">🕐 ${time}</div>` : ''}
-            ${address ? `<div class="schedule-location" style="font-size:0.72rem; color:var(--ink-soft); margin-top:3px;">📍 ${address}</div>` : ''}
+            ${address ? `<div class="schedule-location" style="font-size:0.82rem; color:var(--ink-soft); margin-top:3px;">📍 ${address}</div>` : ''}
             ${notes ? `<div class="schedule-notes">${notes}</div>` : ''}
             ${zoom ? `<div style="font-size:0.68rem; color:var(--ink-soft); margin-top:4px; font-style:italic;">Virtual option available upon request</div>` : ''}
           </div>
