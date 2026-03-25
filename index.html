@@ -1044,6 +1044,7 @@ function populateSchedule(rows) {
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+  const nextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 1);
 
   const LOCATION_STYLES = {
     'chapel hill / durham': { bg: '#ddedf7', color: '#3a7ca5' },
@@ -1060,7 +1061,7 @@ function populateSchedule(rows) {
       dateStr = parts[0] + '-' + String(parseInt(parts[1])+1).padStart(2,'0') + '-' + String(parts[2]).padStart(2,'0');
     }
     const d = new Date(dateStr + 'T12:00:00');
-    return !isNaN(d) && d >= today;
+    return !isNaN(d) && d >= today && d < nextMonth;
   });
 
   if (published.length === 0) {
