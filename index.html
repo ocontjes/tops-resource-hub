@@ -1065,9 +1065,17 @@ function populateSchedule(rows) {
   });
 
   published.sort((a, b) => {
-    const dateA = new Date((a['Date'] || '') + 'T12:00:00');
-    const dateB = new Date((b['Date'] || '') + 'T12:00:00');
-    return dateA - dateB;
+    let dateStrA = a['Date'] || '';
+    let dateStrB = b['Date'] || '';
+    if (dateStrA.startsWith('Date(')) {
+      const parts = dateStrA.replace('Date(','').replace(')','').split(',');
+      dateStrA = parts[0] + '-' + String(parseInt(parts[1])+1).padStart(2,'0') + '-' + String(parts[2]).padStart(2,'0');
+    }
+    if (dateStrB.startsWith('Date(')) {
+      const parts = dateStrB.replace('Date(','').replace(')','').split(',');
+      dateStrB = parts[0] + '-' + String(parseInt(parts[1])+1).padStart(2,'0') + '-' + String(parts[2]).padStart(2,'0');
+    }
+    return new Date(dateStrA + 'T12:00:00') - new Date(dateStrB + 'T12:00:00');
   });
   
   if (published.length === 0) {
