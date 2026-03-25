@@ -655,7 +655,7 @@
   <div class="section-head">
     <div>
       <div class="section-eyebrow">Category 05</div>
-      <div class="section-title">Group Meeting Schedule</div>
+      <div class="section-title">Upcoming Group Meetings &amp; Events</div>
     </div>
   </div>
   <div class="schedule-list" id="list-schedule">
@@ -1129,7 +1129,7 @@ function populateSchedule(rows) {
   // Subtle calendar link
   const calWrap = document.createElement('div');
   calWrap.style.cssText = 'text-align:right; margin-top:14px;';
-  calWrap.innerHTML = `<a href="https://calendar.google.com/calendar/embed?src=76085ac8d1dd6f66236701ac78e0592dc3ca16b13525140405459135f899de68%40group.calendar.google.com&ctz=America%2FNew_York" target="_blank" rel="noopener" style="font-size:0.78rem; color:var(--sage); font-weight:600; text-decoration:none;">View full calendar →</a>`;
+  calWrap.innerHTML = `<a href="https://calendar.google.com/calendar/embed?src=76085ac8d1dd6f66236701ac78e0592dc3ca16b13525140405459135f899de68%40group.calendar.google.com&ctz=America%2FNew_York" target="_blank" rel="noopener" class="btn btn-outline" style="display:inline-flex; margin-top:8px;">📅 View Full Calendar</a>`;
   list.parentElement.appendChild(calWrap);
 }
 
