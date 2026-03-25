@@ -1048,7 +1048,7 @@ function populateSchedule(rows) {
   const LOCATION_STYLES = {
     'chapel hill / durham': { bg: '#ddedf7', color: '#3a7ca5' },
     'raleigh':              { bg: '#fde8e8', color: '#c0444d' },
-    'all sites':            { bg: 'var(--sage-pale)', color: 'var(--sage)' },
+    'all sites': { bg: '#fdecc8', color: '#9a6b1f' },
     'virtual':              { bg: 'var(--plum-light)', color: 'var(--plum)' },
   };
 
@@ -1086,7 +1086,7 @@ function populateSchedule(rows) {
       const locStyle = LOCATION_STYLES[location.toLowerCase()] || null;
 
       const locationTag = locStyle
-        ? `<span style="background:${locStyle.bg}; color:${locStyle.color}; font-size:0.62rem; font-weight:700; letter-spacing:0.07em; text-transform:uppercase; padding:3px 10px; border-radius:100px; white-space:nowrap;">📍 ${location}</span>`
+        ? `<span style="background:${locStyle.bg}; color:${locStyle.color}; font-size:0.62rem; font-weight:700; letter-spacing:0.07em; text-transform:uppercase; padding:3px 10px; border-radius:100px; white-space:nowrap;">${location.toLowerCase() === 'all sites' ? '⭐ ' : ''}${location}</span>`
         : '';
 
       return `
@@ -1102,7 +1102,7 @@ function populateSchedule(rows) {
               ${groups ? `<span style="font-size:0.72rem; font-weight:600; color:var(--ink-mid);">${groups}</span>` : ''}
             </div>
             ${title ? `<div class="schedule-title"><strong>${title}</strong></div>` : ''}
-            ${time ? `<div class="schedule-time">🗓️ ${time}</div>` : ''}
+            ${time ? `<div class="schedule-time">🕐 ${time}</div>` : ''}
             ${address ? `<div class="schedule-location" style="font-size:0.72rem; color:var(--ink-soft); margin-top:3px;">📍 ${address}</div>` : ''}
             ${notes ? `<div class="schedule-notes">${notes}</div>` : ''}
             ${zoom ? `<div style="font-size:0.68rem; color:var(--ink-soft); margin-top:4px; font-style:italic;">Virtual option available upon request</div>` : ''}
