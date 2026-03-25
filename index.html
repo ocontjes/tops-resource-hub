@@ -931,19 +931,16 @@ function populateGrids(rows) {
       return;
     }
 
-    // Collect unique tags for filter bar
     const tagSet = new Set();
     items.forEach(row => {
       if (row['Tag 1'] && row['Tag 1'].trim()) tagSet.add(row['Tag 1'].trim());
       if (row['Tag 2'] && row['Tag 2'].trim()) tagSet.add(row['Tag 2'].trim());
     });
 
-    // Render cards
     items.slice(0, 3).forEach(row => grid.insertAdjacentHTML('beforeend', renderResource(row)));
 
     if (items.length > 3) {
       const hiddenId = 'hidden-' + key;
-      const btnId    = 'btn-' + key;
       const hiddenDiv = document.createElement('div');
       hiddenDiv.id = hiddenId;
       hiddenDiv.style.display = 'none';
@@ -951,7 +948,7 @@ function populateGrids(rows) {
       hiddenDiv.style.marginTop = '18px';
       items.slice(3).forEach(row => hiddenDiv.insertAdjacentHTML('beforeend', renderResource(row)));
       grid.appendChild(hiddenDiv);
-      const remaining = items.length - 3;
+
       const viewAllLink = document.querySelector(`#${key} .section-all`);
       if (viewAllLink) {
         viewAllLink.textContent = 'View all →';
@@ -968,13 +965,12 @@ function populateGrids(rows) {
             viewAllLink.textContent = 'View all →';
           }
         };
-      const viewAllLinkCheck = document.querySelector(`#${key} .section-all`);
-        if (viewAllLinkCheck && items.length <= 3) {
-          viewAllLinkCheck.style.display = 'none';
-        }
       }
+    } else {
+      const viewAllLink = document.querySelector(`#${key} .section-all`);
+      if (viewAllLink) viewAllLink.style.display = 'none';
+    }
 
-    // Render filter bar if more than one tag
     if (tagSet.size > 1) {
       renderFilterBar(key, [...tagSet], 'grid-' + key);
     }
