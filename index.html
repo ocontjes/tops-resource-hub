@@ -286,7 +286,35 @@
 
   .section-all:hover { color: var(--ink); }
 
-  /* ─── RESOURCE CARDS ──────────────────────────────────── */
+  /* ─── FILTER BAR ─────────────────────────────────────────── */
+.filter-bar {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-bottom: 20px;
+}
+
+.filter-pill {
+  border: 1.5px solid var(--sage-light);
+  background: transparent;
+  color: var(--ink-mid);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.75rem; font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 6px 14px; border-radius: 100px;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, border-color 0.18s;
+}
+
+.filter-pill:hover {
+  border-color: var(--sage);
+  color: var(--ink);
+}
+
+.filter-pill.active {
+  background: var(--ink);
+  color: white;
+  border-color: var(--ink);
+}
+/* ─── RESOURCE CARDS ─────────────────────────── */
   .card-grid {
     display: grid; grid-template-columns: repeat(3,1fr); gap: 18px;
   }
@@ -808,7 +836,7 @@ if (rawDate.startsWith('Date(')) {
   const tagPills = [getTagPill(tag1), getTagPill(tag2)].filter(Boolean).join(' ');
 
   return `
-    <a class="resource-card ${cfg.cls}" href="${url}" target="_blank" rel="noopener">
+    <a class="resource-card ${cfg.cls}" href="${url}" target="_blank" rel="noopener" data-tag1="${tag1}" data-tag2="${tag2}">
       <div class="rc-top">
         <div class="rc-icon">${getTypeIcon(type, tag1)}</div>
         <span class="rc-type-badge">${type}</span>
@@ -826,6 +854,55 @@ if (rawDate.startsWith('Date(')) {
 }
 
 // ── Populate grids ─────────────────────────────────────────
+function renderFilterBar(containerId, tags, gridId) {
+  const existing = document.getElementById('filter-' + containerId);
+  if (existing) existing.remove();
+
+  const bar = document.createElement('div');
+  bar.className = 'filter-bar';
+  bar.id = 'filter-' + containerId;
+
+  const allBtn = document.createElement('button');
+  allBtn.className = 'filter-pill active';
+  allBtn.textContent = 'All';
+  allBtn.onclick = () => applyFilter(containerId, gridId, null, bar);
+  bar.appendChild(allBtn);
+
+  tags.forEach(tag => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-pill';
+    btn.textContent = tag;
+    btn.onclick = () => applyFilter(containerId, gridId, tag, bar);
+    bar.appendChild(btn);
+  });
+
+  const grid = document.getElementById(gridId);
+  grid.parentElement.insertBefore(bar, grid);
+}
+
+function applyFilter(containerId, gridId, activeTag, bar) {
+  // Update active pill
+  bar.querySelectorAll('.filter-pill').forEach(btn => {
+    btn.classList.toggle('active',
+      activeTag === null ? btn.textContent === 'All' : btn.textContent === activeTag
+    );
+  });
+
+  // Show/hide cards
+  const grid = document.getElementById(gridId);
+  const cards = grid.querySelectorAll('.resource-card');
+  cards.forEach(card => {
+    if (!activeTag) {
+      card.style.display = '';
+      return;
+    }
+    const tag1 = (card.dataset.tag1 || '').toLowerCase().trim();
+    const tag2 = (card.dataset.tag2 || '').toLowerCase().trim();
+    const match = tag1 === activeTag.toLowerCase() || tag2 === activeTag.toLowerCase();
+    card.style.display = match ? '' : 'none';
+  });
+}
+
 function populateGrids(rows) {
   const published = rows.filter(r => (r['Status'] || '').toLowerCase() === 'published');
   const categories = {
@@ -838,6 +915,7 @@ function populateGrids(rows) {
     const cat = getCat(row['Category']);
     if (grouped[cat]) grouped[cat].push(row);
   });
+
   Object.entries(categories).forEach(([key, grid]) => {
     if (!grid) return;
     grid.innerHTML = '';
@@ -846,7 +924,17 @@ function populateGrids(rows) {
       grid.innerHTML = '<div class="empty-state"><strong>Coming soon</strong>Resources for this section are being added.</div>';
       return;
     }
+
+    // Collect unique tags for filter bar
+    const tagSet = new Set();
+    items.forEach(row => {
+      if (row['Tag 1'] && row['Tag 1'].trim()) tagSet.add(row['Tag 1'].trim());
+      if (row['Tag 2'] && row['Tag 2'].trim()) tagSet.add(row['Tag 2'].trim());
+    });
+
+    // Render cards
     items.slice(0, 3).forEach(row => grid.insertAdjacentHTML('beforeend', renderResource(row)));
+
     if (items.length > 3) {
       const hiddenId = 'hidden-' + key;
       const btnId    = 'btn-' + key;
@@ -862,6 +950,11 @@ function populateGrids(rows) {
       btnWrap.style.cssText = 'grid-column: 1 / -1; text-align: center; padding-top: 8px;';
       btnWrap.innerHTML = `<button id="${btnId}" onclick="toggleMore('${hiddenId}','${btnId}',${remaining})" style="background:transparent;border:1.5px solid var(--sage-light);color:var(--ink);padding:10px 24px;border-radius:100px;font-family:inherit;font-size:0.85rem;font-weight:600;cursor:pointer;">Show ${remaining} more</button>`;
       grid.appendChild(btnWrap);
+    }
+
+    // Render filter bar if more than one tag
+    if (tagSet.size > 1) {
+      renderFilterBar(key, [...tagSet], 'grid-' + key);
     }
   });
 }
