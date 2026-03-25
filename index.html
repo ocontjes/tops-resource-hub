@@ -324,7 +324,7 @@
   .rc-type-badge {
     font-size: 0.6rem; font-weight: 700;
     letter-spacing: 0.07em; text-transform: uppercase;
-    padding: 3px 9px; border-radius: 100px;
+    padding: 3px 9px; border-radius: 100px; background: #f0f0ee; color: #4a5550;
   }
 
   .rc-title {
@@ -345,31 +345,27 @@
   .rc-date { font-size: 0.68rem; color: var(--ink-soft); }
 
   .rc-arrow {
-    width: 26px; height: 26px; border-radius: 50%;
-    background: var(--sage-pale);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.72rem; color: var(--sage);
-    transition: background 0.18s, color 0.18s;
-  }
+  width: 26px; height: 26px; border-radius: 50%;
+  background: #f0f0ee;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.72rem; color: #4a5550;
+  transition: background 0.18s, color 0.18s;
+}
 
   .resource-card:hover .rc-arrow { background: var(--sage); color: white; }
 
   /* category accent variants */
-  .cat-move .rc-icon { background: var(--sage-pale); }
-  .cat-move .rc-type-badge { background: var(--sage-pale); color: var(--sage-mid); }
-  .cat-move::after { background: var(--sage); }
+.cat-move .rc-icon { background: var(--sage-pale); }
+.cat-move::after { background: var(--sage); }
 
-  .cat-food .rc-icon { background: var(--amber-light); }
-  .cat-food .rc-type-badge { background: var(--amber-light); color: var(--amber); }
-  .cat-food::after { background: var(--amber); }
+.cat-food .rc-icon { background: var(--amber-light); }
+.cat-food::after { background: var(--amber); }
 
-  .cat-mind .rc-icon { background: var(--plum-light); }
-  .cat-mind .rc-type-badge { background: var(--plum-light); color: var(--plum); }
-  .cat-mind::after { background: var(--plum); }
+.cat-mind .rc-icon { background: var(--plum-light); }
+.cat-mind::after { background: var(--plum); }
 
-  .cat-community .rc-icon { background: var(--clay-light); }
-  .cat-community .rc-type-badge { background: var(--clay-light); color: var(--clay); }
-  .cat-community::after { background: var(--clay); }
+.cat-community .rc-icon { background: var(--clay-light); }
+.cat-community::after { background: var(--clay); }
 
   /* ─── UPDATES ─────────────────────────────────────────── */
   .updates-list { display: flex; flex-direction: column; gap: 14px; }
@@ -598,7 +594,7 @@
   <div class="section-head">
     <div>
       <div class="section-eyebrow">Category 03</div>
-      <div class="section-title">Mental Health &amp; Wellbeing</div>
+      <div class="section-title">Mental Health &amp; Well-being</div>
     </div>
     <a href="#" class="section-all">View all &rarr;</a>
   </div>
