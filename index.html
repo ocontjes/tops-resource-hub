@@ -721,20 +721,41 @@ function getCat(raw) {
 }
 
 // ── Type icons ─────────────────────────────────────────────
-function getTypeIcon(type) {
+function getTypeIcon(type, tag1) {
+  // Tag-based icons (more specific)
+  const tag = (tag1 || '').toLowerCase().trim();
+  if (tag === 'strength & fitness')              return '💪';
+  if (tag === 'low-impact movement')             return '🚶';
+  if (tag === 'cardio')                          return '🏃';
+  if (tag === 'walking trails & resources')      return '🥾';
+  if (tag === 'menopause & life transitions')    return '🌸';
+  if (tag === 'stress & resilience')             return '🧘';
+  if (tag === 'grief, loss & caregiving')        return '💙';
+  if (tag === 'sleep')                           return '😴';
+  if (tag === 'healthy recipes & meal prep')     return '👩‍🍳';
+  if (tag === 'dietary guides & recommendations') return '🥦';
+  if (tag === 'heart health')                    return '❤️';
+  if (tag === 'weight management')               return '⚖️';
+  if (tag === 'mindful eating')                  return '🍽️';
+  if (tag === 'eating & body image')             return '🌿';
+  if (tag === 'emotional health & healing')      return '💚';
+  if (tag === 'substance use & recovery')        return '🤝';
+  if (tag === 'find a provider')                 return '📍';
+
+  // Type-based fallbacks
   const t = (type || '').toLowerCase();
-  if (t.includes('video'))              return '▶️';
-  if (t.includes('pdf'))                return '📄';
-  if (t.includes('podcast list'))       return '🎧';
-  if (t.includes('podcast'))            return '🎙️';
-  if (t.includes('reading list'))       return '📚';
-  if (t.includes('book'))               return '📖';
-  if (t.includes('article'))            return '📰';
-  if (t.includes('workout'))            return '🏃';
-  if (t.includes('nutrition guide'))    return '🥗';
-  if (t.includes('infographic'))        return '📊';
-  if (t.includes('tool') || t.includes('app')) return '📱';
-  if (t.includes('website'))            return '🌐';
+  if (t.includes('video'))                       return '▶️';
+  if (t.includes('pdf'))                         return '📄';
+  if (t.includes('podcast list'))                return '🎧';
+  if (t.includes('podcast'))                     return '🎙️';
+  if (t.includes('reading list'))                return '📚';
+  if (t.includes('book'))                        return '📖';
+  if (t.includes('article'))                     return '📰';
+  if (t.includes('workout'))                     return '🏋️';
+  if (t.includes('nutrition guide'))             return '🥗';
+  if (t.includes('infographic'))                 return '📊';
+  if (t.includes('tool') || t.includes('app'))  return '📱';
+  if (t.includes('website'))                     return '🌐';
   return '📌';
 }
 
