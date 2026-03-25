@@ -952,15 +952,31 @@ function populateGrids(rows) {
       items.slice(3).forEach(row => hiddenDiv.insertAdjacentHTML('beforeend', renderResource(row)));
       grid.appendChild(hiddenDiv);
       const remaining = items.length - 3;
-      const btnWrap = document.createElement('div');
-      btnWrap.style.cssText = 'grid-column: 1 / -1; text-align: center; padding-top: 8px;';
-      btnWrap.innerHTML = `<button id="${btnId}" onclick="toggleMore('${hiddenId}','${btnId}',${remaining})" style="background:transparent;border:1.5px solid var(--sage-light);color:var(--ink);padding:10px 24px;border-radius:100px;font-family:inherit;font-size:0.85rem;font-weight:600;cursor:pointer;">Show ${remaining} more</button>`;
-      grid.appendChild(btnWrap);
-    }
+      const viewAllLink = document.querySelector(`#${key} .section-all`);
+      if (viewAllLink) {
+        viewAllLink.textContent = 'View all →';
+        viewAllLink.href = '#';
+        viewAllLink.onclick = (e) => {
+          e.preventDefault();
+          const hidden = document.getElementById(hiddenId);
+          if (!hidden) return;
+          if (hidden.style.display === 'none') {
+            hidden.style.display = 'contents';
+            viewAllLink.textContent = 'Show less ←';
+          } else {
+            hidden.style.display = 'none';
+            viewAllLink.textContent = 'View all →';
+          }
+        };
+      }
 
     // Render filter bar if more than one tag
     if (tagSet.size > 1) {
       renderFilterBar(key, [...tagSet], 'grid-' + key);
+    }
+      const viewAllLinkCheck = document.querySelector(`#${key} .section-all`);
+    if (viewAllLinkCheck && items.length <= 3) {
+      viewAllLinkCheck.style.display = 'none';
     }
   });
 }
