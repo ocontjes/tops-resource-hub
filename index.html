@@ -714,10 +714,15 @@ const CAT_MAP = {
 
 function getCat(raw) {
   const key = (raw || '').toLowerCase().trim();
+  if (key === 'movement')  return 'movement';
+  if (key === 'nutrition') return 'nutrition';
+  if (key === 'wellbeing') return 'wellbeing';
+  // fallback fuzzy match
   if (key.includes('move') || key.includes('exercise')) return 'movement';
   if (key.includes('nutri') || key.includes('recipe') || key.includes('food')) return 'nutrition';
   if (key.includes('well') || key.includes('mental') || key.includes('health')) return 'wellbeing';
-  return 'movement';
+  return 'wellbeing';
+}
 }
 
 // ── Type icons ─────────────────────────────────────────────
@@ -774,7 +779,13 @@ function renderResource(row) {
   const catKey = getCat(row['Category']);
   const cfg    = CAT_MAP[catKey] || CAT_MAP['movement'];
   const url    = row['URL'] || row['Url'] || row['url'] || '#';
-  const date   = row['Date Added'] || row['Date'] || '';
+  const rawDate = row['Date Added'] || row['Date'] || '';
+let date = rawDate ? 'Added: ' + rawDate : '';
+if (rawDate.startsWith('Date(')) {
+  const parts = rawDate.replace('Date(','').replace(')','').split(',');
+  const d = new Date(parseInt(parts[0]), parseInt(parts[1]), parseInt(parts[2]));
+  date = 'Added: ' + d.toLocaleString('default', { month: 'short', year: 'numeric' });
+}
   const type   = row['Type'] || 'Resource';
   const tag1   = (row['Tag 1'] || '').trim();
   const tag2   = (row['Tag 2'] || '').trim();
