@@ -670,37 +670,7 @@
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 /*
-  ══════════════════════════════════════════════════════════
-  TOPS RESOURCE HUB — GOOGLE SHEETS CONFIGURATION
-  ══════════════════════════════════════════════════════════
-
-  STEP 1 — Create your Google Sheet with 3 tabs:
-    Tab 1 "Resources"     — columns: Title | Category | Type | Description | URL | Date Added | Status
-    Tab 2 "Pending"       — same columns (fed by Google Form submissions)
-    Tab 3 "Announcements" — columns: Title | Description | Date | Tag | Status
-
-  STEP 2 — Publish the sheet to the web:
-    In Google Sheets → File → Share → Publish to web
-    Choose "Entire Document" and "CSV" format → Publish
-    (This makes it readable by the site. It does NOT make your sheet editable by anyone.)
-
-  STEP 3 — Find your Sheet ID and tab GIDs:
-    Sheet ID: the long string in your sheet's URL between /d/ and /edit
-    GIDs: click each tab — the number after ?gid= in the URL is that tab's GID
-    Tab 1 (Resources) GID is usually 0
-    Tab 2 (Announcements) GID — check the URL when you click that tab
-
-  STEP 4 — Paste your values below and save the file.
-
-  STEP 5 — Paste your Google Form URL into FORM_URL below
-    so the Submit button links directly to the form.
-
-  STEP 6 — Delete or comment out the #setup-notice div in the HTML
-    once everything is working.
-  ══════════════════════════════════════════════════════════
-*/
-
-const SHEET_CONFIG = {
+  const SHEET_CONFIG = {
   sheetId:           '1u5v7kz5zsPLnjOgY-hZUP8BG4AYJeArQeMMultgnVBg',
   resourcesGid:      '0',
   announcementsGid:  '499596198',
@@ -709,59 +679,37 @@ const SHEET_CONFIG = {
 
 const FORM_URL = 'https://forms.gle/obt7mwQxTN6H7ohb6';
 
-// ── Utility ───────────────────────────────────────────────
-// Fetch sheet using raw JSON endpoint — no google object needed
+// ── Fetch sheet ────────────────────────────────────────────
 function fetchSheet(gid) {
   return new Promise((resolve, reject) => {
     const url = `https://docs.google.com/spreadsheets/d/${SHEET_CONFIG.sheetId}/gviz/tq?tqx=out:json&gid=${gid}&headers=1`;
-    
     fetch(url)
       .then(r => r.text())
       .then(text => {
-        // Google wraps response in /*O_o*/ google.visualization.Query.setResponse(...)
-        //Strip everything before first { and after last }
         const start = text.indexOf('{');
-        const end = text.lastIndexOf('}');
-        const json = text.substring(start, end + 1);
-        const data = JSON.parse(json);
-        const cols = data.table.cols.map(c => c.label);
-        const rows = data.table.rows.map(r => {
-          const obj = {};
-          cols.forEach((col, i) => {
-            obj[col] = (r.c[i] && r.c[i].v != null) ? String(r.c[i].v) : '';
+        const end   = text.lastIndexOf('}');
+        const data  = JSON.parse(text.substring(start, end + 1));
+        const cols  = data.table.cols.map(c => c.label);
+        const rows  = data.table.rows
+          .filter(r => r.c && r.c.some(c => c && c.v != null))
+          .map(r => {
+            const obj = {};
+            cols.forEach((col, i) => {
+              obj[col] = (r.c[i] && r.c[i].v != null) ? String(r.c[i].v).trim() : '';
+            });
+            return obj;
           });
-          return obj;
-        });
         resolve(rows);
       })
       .catch(reject);
   });
 }
 
-function parseCSV(text) {
-  const lines = text.trim().split('\n');
-  const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g,'').trim());
-  return lines.slice(1).map(line => {
-    const vals = [];
-    let cur = '', inQ = false;
-    for (let i = 0; i < line.length; i++) {
-      const ch = line[i];
-      if (ch === '"') { inQ = !inQ; }
-      else if (ch === ',' && !inQ) { vals.push(cur.trim()); cur = ''; }
-      else cur += ch;
-    }
-    vals.push(cur.trim());
-    const obj = {};
-    headers.forEach((h, i) => obj[h] = (vals[i] || '').replace(/^"|"$/g,''));
-    return obj;
-  });
-}
-
-// ── Category config ────────────────────────────────────────
+// ── Category mapping ───────────────────────────────────────
 const CAT_MAP = {
   'movement':  { cls: 'cat-move',      icon: '🚶', label: 'Movement & Exercise' },
   'nutrition': { cls: 'cat-food',      icon: '🥗', label: 'Nutrition & Recipes' },
-  'wellbeing': { cls: 'cat-mind',      icon: '💬', label: 'Mental Health & Wellbeing' },
+  'wellbeing': { cls: 'cat-mind',      icon: '💬', label: 'Wellbeing & Mental Health' },
   'community': { cls: 'cat-community', icon: '🤝', label: 'Community' },
 };
 
@@ -773,31 +721,65 @@ function getCat(raw) {
   return 'movement';
 }
 
+// ── Type icons ─────────────────────────────────────────────
 function getTypeIcon(type) {
   const t = (type || '').toLowerCase();
-  if (t.includes('recipe'))    return '🍽';
-  if (t.includes('video'))     return '▶';
-  if (t.includes('website'))   return '🌐';
-  if (t.includes('podcast list')) return '🎧';
-  if (t.includes('podcast'))   return '🎙';
-  if (t.includes('reading list')) return '📚';
-  if (t.includes('book'))      return '📖';
-  if (t.includes('article'))   return '📰';
-  if (t.includes('workout'))   return '🏃';
-  if (t.includes('nutrition')) return '🥗';
-  if (t.includes('pdf'))       return '📄';
-  if (t.includes('infographic')) return '📊';
-if (t.includes('app'))         return '📱';
+  if (t.includes('video'))              return '▶️';
+  if (t.includes('pdf'))                return '📄';
+  if (t.includes('podcast list'))       return '🎧';
+  if (t.includes('podcast'))            return '🎙️';
+  if (t.includes('reading list'))       return '📚';
+  if (t.includes('book'))               return '📖';
+  if (t.includes('article'))            return '📰';
+  if (t.includes('workout'))            return '🏃';
+  if (t.includes('nutrition guide'))    return '🥗';
+  if (t.includes('infographic'))        return '📊';
+  if (t.includes('tool') || t.includes('app')) return '📱';
+  if (t.includes('website'))            return '🌐';
   return '📌';
 }
 
-// ── Render resources ───────────────────────────────────────
+// ── Tag pill colors ────────────────────────────────────────
+const TAG_COLORS = {
+  // Movement — amber
+  'strength & fitness':        'background:#fef3e8;color:#c4783a',
+  'cardio':                    'background:#fef3e8;color:#c4783a',
+  'low-impact movement':       'background:#fef3e8;color:#c4783a',
+  'walking trails & resources':'background:#fef3e8;color:#c4783a',
+  // Nutrition — green
+  'healthy recipes & meal prep':        'background:#eef4f1;color:#5c8470',
+  'dietary guides & recommendations':   'background:#eef4f1;color:#5c8470',
+  'mindful eating':                     'background:#eef4f1;color:#5c8470',
+  'weight management':                  'background:#eef4f1;color:#5c8470',
+  'heart health':                       'background:#eef4f1;color:#5c8470',
+  // Wellbeing — purple
+  'menopause & life transitions':  'background:#f0edf8;color:#7b6aaa',
+  'emotional health & healing':    'background:#f0edf8;color:#7b6aaa',
+  'grief, loss & caregiving':      'background:#f0edf8;color:#7b6aaa',
+  'eating & body image':           'background:#f0edf8;color:#7b6aaa',
+  'stress & resilience':           'background:#f0edf8;color:#7b6aaa',
+  'sleep':                         'background:#f0edf8;color:#7b6aaa',
+  // General — slate
+  'substance use & recovery':  'background:#f0f0f0;color:#4a5550',
+  'find a provider':           'background:#f0f0f0;color:#4a5550',
+};
+
+function getTagPill(tag) {
+  if (!tag || tag.trim() === '') return '';
+  const style = TAG_COLORS[tag.toLowerCase().trim()] || 'background:#f0f0f0;color:#4a5550';
+  return `<span style="${style}; font-size:0.58rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; padding:3px 8px; border-radius:100px; white-space:nowrap;">${tag}</span>`;
+}
+
+// ── Render resource card ───────────────────────────────────
 function renderResource(row) {
   const catKey = getCat(row['Category']);
   const cfg    = CAT_MAP[catKey] || CAT_MAP['movement'];
   const url    = row['URL'] || row['Url'] || row['url'] || '#';
   const date   = row['Date Added'] || row['Date'] || '';
-  const type   = row['Type'] || row['Resource type'] || 'Resource';
+  const type   = row['Type'] || 'Resource';
+  const tag1   = (row['Tag 1'] || '').trim();
+  const tag2   = (row['Tag 2'] || '').trim();
+  const tagPills = [getTagPill(tag1), getTagPill(tag2)].filter(Boolean).join(' ');
 
   return `
     <a class="resource-card ${cfg.cls}" href="${url}" target="_blank" rel="noopener">
@@ -806,14 +788,18 @@ function renderResource(row) {
         <span class="rc-type-badge">${type}</span>
       </div>
       <div class="rc-title">${row['Title'] || 'Untitled'}</div>
-      <div class="rc-desc">${row['Description'] || row['Short description'] || ''}</div>
+      <div class="rc-desc">${row['Description'] || ''}</div>
       <div class="rc-foot">
-        <span class="rc-date">${date}</span>
+        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; flex:1;">
+          <span class="rc-date">${date}</span>
+          ${tagPills}
+        </div>
         <div class="rc-arrow">→</div>
       </div>
     </a>`;
 }
 
+// ── Populate grids ─────────────────────────────────────────
 function populateGrids(rows) {
   const published = rows.filter(r => (r['Status'] || '').toLowerCase() === 'published');
   const categories = {
@@ -831,29 +817,24 @@ function populateGrids(rows) {
     grid.innerHTML = '';
     const items = grouped[key];
     if (items.length === 0) {
-      grid.innerHTML = '<div class="empty-state"><strong>Coming soon</strong>Resources for this section are being added. Check back soon.</div>';
+      grid.innerHTML = '<div class="empty-state"><strong>Coming soon</strong>Resources for this section are being added.</div>';
       return;
     }
-    items.slice(0, 3).forEach(row => {
-      grid.insertAdjacentHTML('beforeend', renderResource(row));
-    });
+    items.slice(0, 3).forEach(row => grid.insertAdjacentHTML('beforeend', renderResource(row)));
     if (items.length > 3) {
       const hiddenId = 'hidden-' + key;
-      const btnId = 'btn-' + key;
+      const btnId    = 'btn-' + key;
       const hiddenDiv = document.createElement('div');
       hiddenDiv.id = hiddenId;
       hiddenDiv.style.display = 'none';
-      hiddenDiv.style.cssText = 'display:none;';
-hiddenDiv.classList.add('card-grid');
-hiddenDiv.style.marginTop = '18px';
-      items.slice(3).forEach(row => {
-        hiddenDiv.insertAdjacentHTML('beforeend', renderResource(row));
-      });
+      hiddenDiv.classList.add('card-grid');
+      hiddenDiv.style.marginTop = '18px';
+      items.slice(3).forEach(row => hiddenDiv.insertAdjacentHTML('beforeend', renderResource(row)));
       grid.appendChild(hiddenDiv);
       const remaining = items.length - 3;
       const btnWrap = document.createElement('div');
       btnWrap.style.cssText = 'grid-column: 1 / -1; text-align: center; padding-top: 8px;';
-      btnWrap.innerHTML = '<button id="' + btnId + '" onclick="toggleMore(\'' + hiddenId + '\', \'' + btnId + '\', ' + remaining + ')" style="background:transparent; border:1.5px solid var(--sage-light); color:var(--ink); padding:10px 24px; border-radius:100px; font-family:inherit; font-size:0.85rem; font-weight:600; cursor:pointer;">Show ' + remaining + ' more</button>';
+      btnWrap.innerHTML = `<button id="${btnId}" onclick="toggleMore('${hiddenId}','${btnId}',${remaining})" style="background:transparent;border:1.5px solid var(--sage-light);color:var(--ink);padding:10px 24px;border-radius:100px;font-family:inherit;font-size:0.85rem;font-weight:600;cursor:pointer;">Show ${remaining} more</button>`;
       grid.appendChild(btnWrap);
     }
   });
@@ -861,7 +842,7 @@ hiddenDiv.style.marginTop = '18px';
 
 function toggleMore(hiddenId, btnId, remaining) {
   const hidden = document.getElementById(hiddenId);
-  const btn = document.getElementById(btnId);
+  const btn    = document.getElementById(btnId);
   if (!hidden || !btn) return;
   if (hidden.style.display === 'none') {
     hidden.style.display = 'contents';
@@ -872,17 +853,15 @@ function toggleMore(hiddenId, btnId, remaining) {
   }
 }
 
-// ── Render announcements ───────────────────────────────────
+// ── Announcements ──────────────────────────────────────────
 function populateAnnouncements(rows) {
   const wrap = document.getElementById('announce-wrap');
   const published = rows.filter(r =>
-  (r['Status'] || '').toLowerCase() === 'published' &&
-  (r['Group'] || '').toLowerCase() === 'all'
-);
-
+    (r['Status'] || '').toLowerCase() === 'published' &&
+    (r['Group']  || '').toLowerCase() === 'all'
+  );
   wrap.parentElement.style.display = '';
   if (published.length === 0) { wrap.parentElement.style.display = 'none'; return; }
-
   wrap.innerHTML = published.map(row => `
     <div class="announce-item">
       <span class="announce-tag">${row['Tag'] || 'Update'}</span>
@@ -893,32 +872,33 @@ function populateAnnouncements(rows) {
     </div>`).join('');
 }
 
-// ── Render updates section ─────────────────────────────────
+// ── Updates ────────────────────────────────────────────────
 function populateUpdates(rows) {
   const list = document.getElementById('list-updates');
   const published = rows.filter(r => (r['Status'] || '').toLowerCase() === 'published');
-
   if (published.length === 0) {
     list.innerHTML = `<div class="empty-state"><strong>No updates yet</strong>Study announcements will appear here.</div>`;
     return;
   }
-
   list.innerHTML = published.map(row => {
     const d = new Date((row['Event Date'] || '') + 'T12:00:00');
-const hasDate = row['Event Date'] && row['Event Date'].trim() !== '' && !isNaN(d);
-    const month = hasDate ? d.toLocaleString('default',{month:'short'}).toUpperCase() : '';
-const day = hasDate ? d.getDate() : '';
+    const hasDate = row['Event Date'] && row['Event Date'].trim() !== '' && !isNaN(d);
+    const month = hasDate ? d.toLocaleString('default', { month: 'short' }).toUpperCase() : '';
+    const day   = hasDate ? d.getDate() : '';
     const tag   = row['Tag'] || 'Update';
-const tagIcon = tag.toLowerCase().includes('action') ? '🔔' : tag.toLowerCase().includes('new content') ? '✨' : tag.toLowerCase().includes('newsletter') ? '📬' : tag.toLowerCase().includes('event') ? '📌' : tag.toLowerCase().includes('reminder') ? '⏰' : '📢';
+    const tagIcon = tag.toLowerCase().includes('action')     ? '🔔'
+                  : tag.toLowerCase().includes('new content') ? '✨'
+                  : tag.toLowerCase().includes('newsletter')  ? '📬'
+                  : tag.toLowerCase().includes('event')       ? '📌'
+                  : tag.toLowerCase().includes('reminder')    ? '⏰' : '📢';
     const tagStyle = tag.toLowerCase().includes('action')
-      ? `background:var(--clay-light);color:var(--clay)`
-      : `background:var(--sage-pale);color:var(--sage)`;
-
+      ? 'background:var(--clay-light);color:var(--clay)'
+      : 'background:var(--sage-pale);color:var(--sage)';
     return `
       <div class="update-row">
         <div class="update-date-block">
-  ${hasDate ? `<span class="ud-month">${month}</span><span class="ud-day">${day}</span>` : `<span style="font-size:1.4rem">${tagIcon}</span>`}
-</div>
+          ${hasDate ? `<span class="ud-month">${month}</span><span class="ud-day">${day}</span>` : `<span style="font-size:1.4rem">${tagIcon}</span>`}
+        </div>
         <div>
           <div class="update-title">${row['Title'] || ''}</div>
           <div class="update-desc">${row['Description'] || ''}</div>
@@ -926,6 +906,68 @@ const tagIcon = tag.toLowerCase().includes('action') ? '🔔' : tag.toLowerCase(
         <span class="update-tag" style="${tagStyle}">${tag}</span>
       </div>`;
   }).join('');
+}
+
+// ── Schedule ───────────────────────────────────────────────
+function populateSchedule(rows) {
+  const list = document.getElementById('list-schedule');
+  if (!list) return;
+  const published = rows.filter(r => (r['Status'] || '').toLowerCase() === 'published');
+  if (published.length === 0) {
+    list.innerHTML = '<div class="empty-state"><strong>Schedule coming soon</strong>Meeting dates will appear here once published.</div>';
+    return;
+  }
+  list.innerHTML = published.map(row => {
+    let dateStr = row['Date'] || '';
+    if (dateStr.startsWith('Date(')) {
+      const parts = dateStr.replace('Date(','').replace(')','').split(',');
+      dateStr = parts[0] + '-' + String(parseInt(parts[1])+1).padStart(2,'0') + '-' + String(parts[2]).padStart(2,'0');
+    }
+    const d     = new Date(dateStr + 'T12:00:00');
+    const month = isNaN(d) ? '—' : d.toLocaleString('default', { month: 'short' }).toUpperCase();
+    const day   = isNaN(d) ? '—' : d.getDate();
+    const year  = isNaN(d) ? '' : d.getFullYear();
+    const group    = row['Group'] || '';
+    const notes    = row['Notes'] || '';
+    const location = row['Location'] || '';
+    return `
+      <div class="schedule-row">
+        <div class="schedule-date-block">
+          <span class="sd-month">${month}</span>
+          <span class="sd-day">${day}</span>
+          <span class="sd-year">${year}</span>
+        </div>
+        <div>
+          <div class="schedule-title"><strong>${row['Title'] || group}</strong></div>
+          <div class="schedule-time">${row['Time'] || ''}</div>
+          ${location ? `<div class="schedule-location">📍 ${location}</div>` : ''}
+          ${notes    ? `<div class="schedule-notes">${notes}</div>` : ''}
+        </div>
+        ${group ? `<span class="schedule-group-tag">${group}</span>` : ''}
+      </div>`;
+  }).join('');
+}
+
+// ── Demo fallback ──────────────────────────────────────────
+function loadDemoData() {
+  const resources = [
+    { Title:'Low-Impact Walking Program', Category:'Movement', Type:'PDF Guide', Description:'A 6-week progressive walking plan designed for joint comfort, with modifications for varying mobility levels.', URL:'#', 'Date Added':'Mar 2025', Status:'Published', 'Tag 1':'Low-Impact Movement', 'Tag 2':'' },
+    { Title:'Seated Strength Training', Category:'Movement', Type:'Video', Description:'Three beginner-friendly routines from a chair, targeting the muscles that support the knee joint.', URL:'#', 'Date Added':'Feb 2025', Status:'Published', 'Tag 1':'Strength & Fitness', 'Tag 2':'' },
+    { Title:'Arthritis Foundation Exercise Resources', Category:'Movement', Type:'Website', Description:'Curated programs including aquatic and tai chi options for all fitness levels.', URL:'https://www.arthritis.org', 'Date Added':'Jan 2025', Status:'Published', 'Tag 1':'Low-Impact Movement', 'Tag 2':'' },
+    { Title:'Anti-Inflammatory Recipe Collection', Category:'Nutrition', Type:'Website', Description:'Anti-inflammatory recipes from the Arthritis National Research Foundation.', URL:'https://curearthritis.org/recipes/', 'Date Added':'Mar 2025', Status:'Published', 'Tag 1':'Healthy Recipes & Meal Prep', 'Tag 2':'Dietary Guides & Recommendations' },
+    { Title:'Anti-Inflammatory Eating Basics', Category:'Nutrition', Type:'PDF Guide', Description:'A one-page visual guide to foods that help manage inflammation and practical swaps for everyday meals.', URL:'#', 'Date Added':'Feb 2025', Status:'Published', 'Tag 1':'Dietary Guides & Recommendations', 'Tag 2':'' },
+    { Title:'MyPlate for Older Adults', Category:'Nutrition', Type:'Website', Description:'USDA guidance on balanced eating patterns tailored for adults 65 and older.', URL:'https://www.myplate.gov', 'Date Added':'Jan 2025', Status:'Published', 'Tag 1':'Dietary Guides & Recommendations', 'Tag 2':'' },
+    { Title:'Podcasts on Aging Well', Category:'Wellbeing', Type:'Podcast List', Description:'Curated episodes covering sleep, stress, social connection, and navigating chronic conditions with resilience.', URL:'#', 'Date Added':'Mar 2025', Status:'Published', 'Tag 1':'Stress & Resilience', 'Tag 2':'Sleep' },
+    { Title:'Books on Living with Chronic Pain', Category:'Wellbeing', Type:'Reading List', Description:'Titles selected for their accessible, practical approach — each with a brief description of what to expect.', URL:'#', 'Date Added':'Feb 2025', Status:'Published', 'Tag 1':'Emotional Health & Healing', 'Tag 2':'' },
+    { Title:'NIAMS Pain Management Resources', Category:'Wellbeing', Type:'Website', Description:'National Institute guidance on coping strategies for joint pain and chronic conditions.', URL:'https://www.niams.nih.gov', 'Date Added':'Jan 2025', Status:'Published', 'Tag 1':'Stress & Resilience', 'Tag 2':'' },
+  ];
+  const announcements = [
+    { Title:'Spring Check-In Visits Now Scheduling', Description:'Your 6-month follow-up includes updated measurements and a brief survey. Appointments available March through May.', Date:'2025-03-14', Tag:'Action Needed', Status:'Published', Group:'all' },
+    { Title:'New Recipes Added to the Nutrition Library', Description:'Eight new anti-inflammatory recipes contributed by participants have been reviewed and added to the hub.', Date:'2025-02-28', Tag:'New Content', Status:'Published', Group:'all' },
+  ];
+  populateGrids(resources);
+  populateAnnouncements(announcements);
+  populateUpdates(announcements);
 }
 
 // ── Scroll reveal ──────────────────────────────────────────
@@ -940,9 +982,9 @@ function initReveal() {
 function initSubmitBtn() {
   const btn = document.getElementById('submit-btn');
   if (FORM_URL && FORM_URL !== 'YOUR_GOOGLE_FORM_URL_HERE') {
-    btn.href = FORM_URL;
+    btn.href   = FORM_URL;
     btn.target = '_blank';
-    btn.rel = 'noopener';
+    btn.rel    = 'noopener';
   } else {
     btn.addEventListener('click', e => {
       e.preventDefault();
@@ -951,85 +993,37 @@ function initSubmitBtn() {
   }
 }
 
-// ── Demo mode (when sheet not yet connected) ───────────────
-function loadDemoData() {
-  const resources = [
-    { Title:'Low-Impact Walking Program', Category:'Movement', Type:'PDF Guide', 'Short description':'A 6-week progressive walking plan designed for joint comfort, with modifications for varying mobility levels.', URL:'#', 'Date Added':'Mar 2025', Status:'Published' },
-    { Title:'Seated Strength Training', Category:'Movement', Type:'Video', 'Short description':'Three beginner-friendly routines from a chair, targeting the muscles that support the knee joint.', URL:'#', 'Date Added':'Feb 2025', Status:'Published' },
-    { Title:'Arthritis Foundation Exercise Resources', Category:'Movement', Type:'External Link', 'Short description':'Curated programs including aquatic and tai chi options for all fitness levels.', URL:'https://www.arthritis.org', 'Date Added':'Jan 2025', Status:'Published' },
-    { Title:'Baked Salmon with Turmeric', Category:'Nutrition', Type:'Recipe', 'Short description':'A simple anti-inflammatory dinner with omega-3 rich salmon and a turmeric-ginger glaze. Ready in 30 minutes.', URL:'#', 'Date Added':'Mar 2025', Status:'Published' },
-    { Title:'Anti-Inflammatory Eating Basics', Category:'Nutrition', Type:'PDF Guide', 'Short description':'A one-page visual guide to foods that help manage inflammation and practical swaps for everyday meals.', URL:'#', 'Date Added':'Feb 2025', Status:'Published' },
-    { Title:'MyPlate for Older Adults', Category:'Nutrition', Type:'External Link', 'Short description':'USDA guidance on balanced eating patterns tailored for adults 65 and older.', URL:'https://www.myplate.gov', 'Date Added':'Jan 2025', Status:'Published' },
-    { Title:'Podcasts on Aging Well', Category:'Wellbeing', Type:'Podcast List', 'Short description':'Curated episodes covering sleep, stress, social connection, and navigating chronic conditions with resilience.', URL:'#', 'Date Added':'Mar 2025', Status:'Published' },
-    { Title:'Books on Living with Chronic Pain', Category:'Wellbeing', Type:'Reading List', 'Short description':'Titles selected for their accessible, practical approach — each with a brief description of what to expect.', URL:'#', 'Date Added':'Feb 2025', Status:'Published' },
-    { Title:'NIAMS Pain Management Resources', Category:'Wellbeing', Type:'External Link', 'Short description':'National Institute guidance on coping strategies for joint pain and chronic conditions.', URL:'https://www.niams.nih.gov', 'Date Added':'Jan 2025', Status:'Published' },
-  ];
-
-  const announcements = [
-    { Title:'Spring Check-In Visits Now Scheduling', Description:'Your 6-month follow-up includes updated measurements and a brief survey. Appointments available March through May.', Date:'2025-03-14', Tag:'Action Needed', Status:'Published' },
-    { Title:'New Recipes Added to the Nutrition Library', Description:'Eight new anti-inflammatory recipes contributed by participants have been reviewed and added to the hub.', Date:'2025-02-28', Tag:'New Content', Status:'Published' },
-  ];
-
-  populateGrids(resources);
-  populateAnnouncements(announcements);
-  populateUpdates(announcements);
-  
-  if (schedule && schedule.length > 0) { populateSchedule(schedule); }
-}
-// ── Render schedule ───────────────────────────────────────
-function populateSchedule(rows) {
-  const list = document.getElementById('list-schedule');
-  if (!list) return;
-  const published = rows.filter(r => (r['Status'] || '').toLowerCase() === 'published');
-  if (published.length === 0) {
-    list.innerHTML = '<div class="empty-state"><strong>Schedule coming soon</strong>Meeting dates will appear here once published.</div>';
-    return;
-  }
-  list.innerHTML = published.map(row => {
-    let dateStr = row['Date'] || '';
-if (dateStr.startsWith('Date(')) { const parts = dateStr.replace('Date(','').replace(')','').split(','); dateStr = parts[0] + '-' + String(parseInt(parts[1])+1).padStart(2,'0') + '-' + String(parts[2]).padStart(2,'0'); }
-const d = new Date(dateStr + 'T12:00:00');
-    const month = isNaN(d) ? '—' : d.toLocaleString('default', { month: 'short' }).toUpperCase();
-    const day = isNaN(d) ? '—' : d.getDate();
-    const year = isNaN(d) ? '' : d.getFullYear();
-    const group = row['Group'] || '';
-    const notes = row['Notes'] || '';
-    const location = row['Location'] || '';
-    return '<div class="schedule-row"><div class="schedule-date-block"><span class="sd-month">' + month + '</span><span class="sd-day">' + day + '</span><span class="sd-year">' + year + '</span></div><div><div class="schedule-title"><strong>' + (row['Title'] || group) + '</strong></div><div class="schedule-time">' + (row['Time'] || '') + '</div>' + (location ? '<div class="schedule-location">📍 ' + location + '</div>' : '') + (notes ? '<div class="schedule-notes">' + notes + '</div>' : '') + '</div>' + (group ? '<span class="schedule-group-tag">' + group + '</span>' : '') + '</div>';
-  }).join('');
-}
 // ── Main init ──────────────────────────────────────────────
 async function init() {
   initReveal();
   initSubmitBtn();
-
-  // Always load demo data first — site is never blank
   loadDemoData();
   document.getElementById('loading-screen').classList.add('hidden');
-
-  // Hide setup notice
   const notice = document.getElementById('setup-notice');
   if (notice) notice.style.display = 'none';
 
-  // Try to load real sheet data on top of demo data
   try {
     const [resources, announcements, schedule] = await Promise.all([
       fetchSheet(SHEET_CONFIG.resourcesGid),
       fetchSheet(SHEET_CONFIG.announcementsGid),
       fetchSheet(SHEET_CONFIG.scheduleGid),
     ]);
+
     if (resources && resources.length > 0) {
-  populateGrids(resources);
-  populateAnnouncements(announcements);
-  populateUpdates(announcements);
-}
-if (schedule && schedule.length > 0) { populateSchedule(schedule); }
+      populateGrids(resources);
+      populateAnnouncements(announcements);
+      populateUpdates(announcements);
+    }
+    if (schedule && schedule.length > 0) {
+      populateSchedule(schedule);
+    }
   } catch (err) {
     console.error('Sheet load error — showing demo data:', err);
   }
 }
+
 window.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('.section').forEach(function(s) { s.classList.add('visible'); });
+  document.querySelectorAll('.section').forEach(s => s.classList.add('visible'));
   init();
 });
 </script>
