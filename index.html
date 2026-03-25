@@ -910,6 +910,16 @@ function applyFilter(containerId, gridId, activeTag, bar) {
 }
 
 function populateGrids(rows) {
+  // Reset all view-all links before populating
+  ['movement', 'nutrition', 'wellbeing'].forEach(key => {
+    const link = document.querySelector(`#${key} .section-all`);
+    if (link) {
+      link.style.display = '';
+      link.textContent = 'View all →';
+      link.onclick = null;
+    }
+  });
+
   const published = rows.filter(r => (r['Status'] || '').toLowerCase() === 'published');
   const categories = {
     movement:  document.getElementById('grid-movement'),
@@ -968,9 +978,11 @@ function populateGrids(rows) {
       }
     } else {
       const viewAllLink = document.querySelector(`#${key} .section-all`);
-      if (viewAllLink) viewAllLink.style.display = 'none';
+      if (viewAllLink) {
+        viewAllLink.style.display = 'none';
+        viewAllLink.textContent = 'View all →';
+      }
     }
-
     if (tagSet.size > 1) {
       renderFilterBar(key, [...tagSet], 'grid-' + key);
     }
