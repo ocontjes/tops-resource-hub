@@ -904,7 +904,7 @@ function populateUpdates(rows) {
   }
 
   list.innerHTML = published.map(row => {
-    const d = new Date(row['Event Date'] || '');
+    const d = new Date((row['Event Date'] || '') + 'T12:00:00');
 const hasDate = row['Event Date'] && row['Event Date'].trim() !== '' && !isNaN(d);
     const month = hasDate ? d.toLocaleString('default',{month:'short'}).toUpperCase() : '';
 const day = hasDate ? d.getDate() : '';
@@ -988,7 +988,7 @@ function populateSchedule(rows) {
   list.innerHTML = published.map(row => {
     let dateStr = row['Date'] || '';
 if (dateStr.startsWith('Date(')) { const parts = dateStr.replace('Date(','').replace(')','').split(','); dateStr = parts[0] + '-' + String(parseInt(parts[1])+1).padStart(2,'0') + '-' + String(parts[2]).padStart(2,'0'); }
-const d = new Date(dateStr);
+const d = new Date(dateStr + 'T12:00:00');
     const month = isNaN(d) ? '—' : d.toLocaleString('default', { month: 'short' }).toUpperCase();
     const day = isNaN(d) ? '—' : d.getDate();
     const year = isNaN(d) ? '' : d.getFullYear();
