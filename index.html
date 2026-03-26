@@ -756,28 +756,7 @@ function getCat(raw) {
 }
 
 // ── Type icons ─────────────────────────────────────────────
-function getTypeIcon(type, tag1) {
-  // Tag-based icons (more specific)
-  const tag = (tag1 || '').toLowerCase().trim();
-  if (tag === 'strength & fitness')              return '💪';
-  if (tag === 'low-impact movement')             return '🚶';
-  if (tag === 'cardio')                          return '🏃';
-  if (tag === 'walking trails & resources')      return '🥾';
-  if (tag === 'menopause & life transitions')    return '🌸';
-  if (tag === 'stress & resilience')             return '🧘';
-  if (tag === 'grief, loss & caregiving')        return '💙';
-  if (tag === 'sleep')                           return '😴';
-  if (tag === 'healthy recipes & meal prep')     return '👩‍🍳';
-  if (tag === 'dietary guides & recommendations') return '🥦';
-  if (tag === 'heart health')                    return '❤️';
-  if (tag === 'weight management')               return '⚖️';
-  if (tag === 'mindful eating')                  return '🍽️';
-  if (tag === 'eating & body image')             return '🌿';
-  if (tag === 'emotional health & healing')      return '💚';
-  if (tag === 'substance use & recovery')        return '🤝';
-  if (tag === 'find a provider')                 return '📍';
-
-  // Type-based fallbacks
+function getTypeIcon(type) {
   const t = (type || '').toLowerCase();
   if (t.includes('video'))                       return '▶️';
   if (t.includes('pdf'))                         return '📄';
@@ -791,7 +770,7 @@ function getTypeIcon(type, tag1) {
   if (t.includes('infographic'))                 return '📊';
   if (t.includes('tool') || t.includes('app'))  return '📱';
   if (t.includes('website'))                     return '🌐';
-  return '📌';
+  return '📌'
 }
 
 // ── Tag pill colors ────────────────────────────────────────
@@ -845,7 +824,7 @@ if (rawDate.startsWith('Date(')) {
   return `
     <a class="resource-card ${cfg.cls}" href="${url}" target="_blank" rel="noopener" data-tag1="${tag1}" data-tag2="${tag2}">
       <div class="rc-top">
-        <div class="rc-icon">${getTypeIcon(type, tag1)}</div>
+        <div class="rc-icon">${getTypeIcon(type)}</div>
         <span class="rc-type-badge">${type}</span>
       </div>
       <div class="rc-title">${row['Title'] || 'Untitled'}</div>
