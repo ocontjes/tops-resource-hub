@@ -523,6 +523,251 @@
     .update-tag { display: none; }
     #announce-section { padding: 0 20px; }
     #setup-notice { margin: 0 20px 24px; }
+  /* ── MATERIALS SECTION ──────────────────────────────────────── */
+
+#materials {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 40px 72px;
+}
+
+#materials .section-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  border-bottom: 1px solid var(--sage-light);
+  padding-bottom: 16px;
+}
+
+#materials .section-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sage);
+  margin-bottom: 6px;
+}
+
+#materials .section-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.6rem;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+#materials .section-desc {
+  font-size: 0.82rem;
+  color: var(--ink-mid);
+  line-height: 1.6;
+  margin-top: 3px;
+}
+
+.materials-filters {
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.mat-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.mat-filter-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  min-width: 42px;
+}
+
+.mat-pill {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 5px 13px;
+  border-radius: 100px;
+  border: 1.5px solid var(--sage-light);
+  background: white;
+  color: var(--ink-mid);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.mat-pill:hover {
+  border-color: var(--sage);
+  color: var(--sage);
+}
+
+.mat-pill.active {
+  background: var(--sage-pale);
+  border-color: var(--sage);
+  color: var(--sage);
+}
+
+.mat-results-count {
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  margin-bottom: 10px;
+}
+
+.mat-list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--sage-light);
+  border-radius: 14px;
+  overflow: hidden;
+  background: white;
+}
+
+.mat-row {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--sage-light);
+  background: white;
+  transition: background 0.12s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.mat-row:last-child {
+  border-bottom: none;
+}
+
+.mat-row:hover {
+  background: var(--sage-pale);
+}
+
+.mat-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.mat-icon-slides    { background: var(--sage-pale); }
+.mat-icon-pdf       { background: var(--clay-light); }
+.mat-icon-recording { background: var(--amber-light); }
+.mat-icon-handout   { background: var(--plum-light); }
+.mat-icon-other     { background: #f0f0ee; }
+
+.mat-body {
+  min-width: 0;
+}
+
+.mat-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mat-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 3px;
+  flex-wrap: wrap;
+}
+
+.mat-topic-badge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 100px;
+  background: var(--sage-pale);
+  color: var(--sage);
+}
+
+.mat-date {
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+}
+
+.mat-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.mat-type-badge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 100px;
+  white-space: nowrap;
+}
+
+.mat-type-slides    { background: var(--sage-pale);   color: var(--sage); }
+.mat-type-pdf       { background: var(--clay-light);  color: var(--clay); }
+.mat-type-recording { background: var(--amber-light); color: var(--amber); }
+.mat-type-handout   { background: var(--plum-light);  color: var(--plum); }
+.mat-type-other     { background: #f0f0ee;             color: var(--ink-mid); }
+
+.mat-open-btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--sage);
+  padding: 5px 12px;
+  border-radius: 100px;
+  border: 1.5px solid var(--sage-light);
+  background: white;
+  white-space: nowrap;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.mat-row:hover .mat-open-btn {
+  background: white;
+  border-color: var(--sage);
+}
+
+.mat-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  line-height: 1.7;
+  border: 1px solid var(--sage-light);
+  border-radius: 14px;
+  background: white;
+}
+
+.mat-state strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--ink-mid);
+  margin-bottom: 6px;
+}
+
+@media (max-width: 860px) {
+  #materials { padding: 0 20px 52px; }
+  .mat-row { grid-template-columns: 32px 1fr; gap: 10px; }
+  .mat-right { display: none; }
+  .mat-title { white-space: normal; }
+}
   }
 </style>
 </head>
@@ -547,6 +792,7 @@
     <li><a href="#updates">Updates</a></li>
     <li><a href="#schedule">Schedule</a></li>
     <li><a href="#community">Community</a></li>
+    <li><a href="#materials">Materials</a></li>
     <li><a href="#community" class="nav-submit">Submit a Resource</a></li>
   </ul>
 </nav>
@@ -658,6 +904,38 @@
   <div class="schedule-list" id="list-schedule">
     <div class="empty-state"><strong>Schedule coming soon</strong>Meeting dates will appear here once published.</div>
   </div>
+</section>
+  <!-- MATERIALS -->
+<section id="materials" class="section visible">
+
+  <div class="section-header">
+    <div>
+      <div class="section-label">Study Resources</div>
+      <div class="section-title">Meeting Materials &amp; Resources</div>
+      <div class="section-desc">Slides, handouts, and recordings from TOPS group sessions.</div>
+    </div>
+  </div>
+
+  <div class="materials-filters" id="mat-filters" style="display:none;">
+    <div class="mat-filter-row">
+      <span class="mat-filter-label">Type</span>
+      <div id="mat-type-pills" style="display:flex; gap:7px; flex-wrap:wrap;"></div>
+    </div>
+    <div class="mat-filter-row">
+      <span class="mat-filter-label">Topic</span>
+      <div id="mat-topic-pills" style="display:flex; gap:7px; flex-wrap:wrap;"></div>
+    </div>
+  </div>
+
+  <div class="mat-results-count" id="mat-count" style="display:none;"></div>
+
+  <div id="mat-list-container">
+    <div class="mat-state">
+      <strong>Loading materials&hellip;</strong>
+      Fetching from Google Sheets
+    </div>
+  </div>
+
 </section>
 <!-- COMMUNITY -->
 <section class="section visible" id="community">
@@ -1196,9 +1474,128 @@ async function init() {
     console.error('Sheet load error — showing demo data:', err);
   }
 }
-
+// ── MATERIALS CONFIG ─────────────────────────────────────────
+const MATERIALS_SHEET_ID = '1u5v7kz5zsPLnjOgY-hZUP8BG4AYJeArQeMMultgnVBg';
+const MATERIALS_TAB      = 'Materials';
+let allMaterials = [];
+let activeType   = 'All';
+let activeTopic  = 'All';
+const MAT_TYPE_ICONS = {
+  'slides': '📊', 'pdf': '📄', 'recording': '🎥', 'handout': '📋',
+};
+function getMatIcon(type) {
+  return MAT_TYPE_ICONS[(type || '').toLowerCase()] || '📁';
+}
+function matTypeClass(type) {
+  const t = (type || '').toLowerCase();
+  if (t === 'slides')    return 'slides';
+  if (t === 'pdf')       return 'pdf';
+  if (t === 'recording') return 'recording';
+  if (t === 'handout')   return 'handout';
+  return 'other';
+}
+function fetchMaterials() {
+  const q   = encodeURIComponent("SELECT * WHERE G = 'Published'");
+  const url = `https://docs.google.com/spreadsheets/d/${MATERIALS_SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(MATERIALS_TAB)}&tq=${q}&tqx=out:json`;
+  fetch(url)
+    .then(r => r.text())
+    .then(raw => {
+      const json = JSON.parse(raw.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/)[1]);
+      const rows = (json.table && json.table.rows) ? json.table.rows : [];
+      allMaterials = rows.map(row => {
+        const c = row.c || [];
+        return {
+          title:       safeMatVal(c[0]),
+          description: safeMatVal(c[1]),
+          type:        safeMatVal(c[2]),
+          topic:       safeMatVal(c[3]),
+          date:        safeMatVal(c[4]),
+          url:         safeMatVal(c[5]),
+        };
+      }).filter(m => m.title && m.url);
+      if (allMaterials.length === 0) {
+        showMatState('No materials published yet.', 'Resources will appear here after each group session.');
+        return;
+      }
+      buildMatFilters();
+      renderMaterials();
+    })
+    .catch(err => {
+      console.error('Materials fetch error:', err);
+      showMatState('Could not load materials.', 'Please try refreshing the page.');
+    });
+}function safeMatVal(cell) {
+  return (cell && cell.v !== null && cell.v !== undefined) ? String(cell.v).trim() : '';
+}
+function buildMatFilters() {
+  const types  = ['All', ...new Set(allMaterials.map(m => m.type).filter(Boolean).sort())];
+  const topics = ['All', ...new Set(allMaterials.map(m => m.topic).filter(Boolean).sort())];
+  buildPillGroup('mat-type-pills',  types,  'type');
+  buildPillGroup('mat-topic-pills', topics, 'topic');
+  document.getElementById('mat-filters').style.display = 'flex';
+  document.getElementById('mat-count').style.display   = 'block';
+}
+function buildPillGroup(containerId, values, filterKey) {
+  const wrap = document.getElementById(containerId);
+  wrap.innerHTML = '';
+  values.forEach(val => {
+    const btn = document.createElement('button');
+    btn.className   = 'mat-pill' + (val === 'All' ? ' active' : '');
+    btn.textContent = val;
+    btn.addEventListener('click', () => {
+      if (filterKey === 'type')  activeType  = val;
+      if (filterKey === 'topic') activeTopic = val;
+      wrap.querySelectorAll('.mat-pill').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      renderMaterials();
+    });
+    wrap.appendChild(btn);
+  });
+}
+function renderMaterials() {
+  const filtered = allMaterials.filter(m => {
+    const okType  = activeType  === 'All' || m.type  === activeType;
+    const okTopic = activeTopic === 'All' || m.topic === activeTopic;
+    return okType && okTopic;
+  });
+  const countEl = document.getElementById('mat-count');
+  countEl.textContent = filtered.length === 1 ? '1 resource' : `${filtered.length} resources`;
+  const container = document.getElementById('mat-list-container');
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="mat-state"><strong>No results</strong>Try adjusting the filters above.</div>`;
+    return;
+  }
+  const rows = filtered.map(m => {
+    const cls   = matTypeClass(m.type);
+    const icon  = getMatIcon(m.type);
+    const topic = m.topic ? `<span class="mat-topic-badge">${matEsc(m.topic)}</span>` : '';
+    const date  = m.date  ? `<span class="mat-date">${matEsc(m.date)}</span>` : '';
+    const ttl   = m.description ? `title="${matEsc(m.description)}"` : '';
+    return `
+      <a class="mat-row" href="${matEsc(m.url)}" target="_blank" rel="noopener noreferrer" ${ttl}>
+        <div class="mat-icon mat-icon-${cls}">${icon}</div>
+        <div class="mat-body">
+          <div class="mat-title">${matEsc(m.title)}</div>
+          <div class="mat-meta">${topic}${date}</div>
+        </div>
+        <div class="mat-right">
+          <span class="mat-type-badge mat-type-${cls}">${matEsc(m.type)}</span>
+          <span class="mat-open-btn">Open ↗</span>
+        </div>
+      </a>`;
+  }).join('');
+  container.innerHTML = `<div class="mat-list">${rows}</div>`;
+}
+function showMatState(heading, body) {
+  document.getElementById('mat-list-container').innerHTML =
+    `<div class="mat-state"><strong>${matEsc(heading)}</strong>${matEsc(body)}</div>`;
+}
+function matEsc(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 window.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('.section').forEach(s => s.classList.add('visible'));
+  document.querySelectorAll('.section').forEach(s => s.classList.add('visible'));fetchMaterials();
   init();
 });
 </script>
