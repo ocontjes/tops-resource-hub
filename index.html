@@ -93,6 +93,57 @@
   }
 
   .nav-submit:hover { background: var(--sage) !important; }
+  .hero-quick-links { display: flex; flex-direction: column; gap: 12px; }
+.hero-ql {
+  background: white;
+  border: 1px solid var(--sage-light);
+  border-radius: 14px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.18s, transform 0.18s;
+}
+.hero-ql:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+.hero-ql-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; flex-shrink: 0;
+}
+.hero-ql-title { font-size: 0.88rem; font-weight: 600; color: var(--ink); margin-bottom: 3px; }
+.hero-ql-sub { font-size: 0.75rem; color: var(--ink-soft); line-height: 1.4; }
+.hero-ql-arrow { font-size: 0.85rem; color: var(--sage); font-weight: 600; flex-shrink: 0; margin-left: auto; }
+
+.hh-mention {
+  background: var(--amber-light);
+  border: 1px solid #f0d9d0;
+  border-radius: 12px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.hh-mention-icon {
+  width: 36px; height: 36px; border-radius: 9px;
+  background: #f0d9d0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+.hh-mention-title { font-size: 0.82rem; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+.hh-mention-sub { font-size: 0.75rem; color: var(--ink-mid); }
+.hh-mention-btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.72rem; font-weight: 600;
+  color: var(--amber); padding: 6px 14px;
+  border-radius: 100px; border: 1.5px solid #f0d9d0;
+  background: white; text-decoration: none;
+  white-space: nowrap; flex-shrink: 0;
+  transition: background 0.15s;
+}
+.hh-mention-btn:hover { background: #f0d9d0; }
   .nav-patientiq {
   background: var(--amber) !important;
   color: white !important;
@@ -826,51 +877,36 @@
     <li><a href="#schedule">Schedule</a></li>
    <li><a href="#materials">Materials</a></li>
     <li><a href="#community">Community</a></li>
-    <li><a href="#community" class="nav-submit">Submit a Resource</a></li>
     <li><a href="https://patient.patientiq.io/access?redirect=/" target="_blank" rel="noopener" class="nav-patientiq">PatientIQ Surveys</a></li>
   </ul>
 </nav>
 
 <!-- HERO -->
-<section class="hero">
+<section class="hero" style="background:var(--sage-pale); border-radius:0; padding:56px 48px;">
   <div>
     <div class="hero-eyebrow">The Osteoarthritis Prevention Study &mdash; UNC-Chapel Hill</div>
     <h1>Your <em>wellness</em><br>resources, all<br>in one place.</h1>
     <p class="hero-sub">Guides, recipes, videos, and tools curated for TOPS participants — organized and easy to find, whenever you need them.</p>
-    <div class="hero-actions">
-      <a href="#movement" class="btn btn-primary">Browse Resources</a>
-      <a href="#community" class="btn btn-outline">Submit Something</a>
-    </div>
   </div>
-  <div class="hero-visual">
-
-  <!-- Card 1: Movement & Exercise -->
-  <div class="hv-card">
-    <div class="hv-icon" style="background:var(--amber-light);">🚶</div>
-    <div class="hv-title">Movement &amp; Exercise</div>
-    <div class="hv-meta">Guides, videos &amp; more</div>
-    <span class="badge" style="background:var(--amber-light); color:var(--amber);">Movement</span>
+  <div class="hero-quick-links">
+    <a href="YOUR_HEALTH_HUB_URL_HERE" target="_blank" rel="noopener" class="hero-ql">
+      <div class="hero-ql-icon" style="background:var(--amber-light);">💪</div>
+      <div>
+        <div class="hero-ql-title">Health Hub</div>
+        <div class="hero-ql-sub">Access your workout videos &amp; exercise demos</div>
+      </div>
+      <span class="hero-ql-arrow">→</span>
+    </a>
+    <a href="#schedule" class="hero-ql">
+      <div class="hero-ql-icon" style="background:var(--sage-pale);">📅</div>
+      <div>
+        <div class="hero-ql-title">Group Schedule</div>
+        <div class="hero-ql-sub">View your upcoming meetings &amp; events</div>
+      </div>
+      <span class="hero-ql-arrow">→</span>
+    </a>
   </div>
-
-  <!-- Card 2: Nutrition & Recipes -->
-  <div class="hv-card">
-    <div class="hv-icon" style="background:#d8edd8;">🥗</div>
-    <div class="hv-title">Nutrition &amp; Recipes</div>
-    <div class="hv-meta">Recipes, guides &amp; tools</div>
-    <span class="badge" style="background:#d8edd8; color:#5c8470;">Nutrition</span>
-  </div>
-
-  <!-- Card 3: Mental Health & Wellbeing -->
-  <div class="hv-card">
-    <div class="hv-icon" style="background:var(--plum-light);">🎧</div>
-    <div class="hv-title">Mental Health &amp; Wellbeing</div>
-    <div class="hv-meta">Podcasts, reads &amp; links</div>
-    <span class="badge" style="background:var(--plum-light); color:var(--plum);">Wellbeing</span>
-  </div>
-
-</div>
 </section>
-
 <!-- SETUP NOTICE (shown until sheet is connected) -->
 
 
@@ -888,6 +924,14 @@
     </div>
     <a href="#" class="section-all">View all &rarr;</a>
   </div>
+  <div class="hh-mention">
+  <div class="hh-mention-icon">💪</div>
+  <div style="flex:1;">
+    <div class="hh-mention-title">Looking for more? Try Health Hub</div>
+    <div class="hh-mention-sub">Hundreds of workout videos &amp; exercise demos provided by the study — log in to explore. Need help? Email <a href="mailto:Tops@email.unc.edu" style="color:var(--amber);">Tops@email.unc.edu</a></div>
+  </div>
+  <a href="YOUR_HEALTH_HUB_URL_HERE" target="_blank" rel="noopener" class="hh-mention-btn">Open Health Hub →</a>
+</div>
   <div class="card-grid" id="grid-movement"><a class="resource-card cat-move" href="https://www.arthritis.org/health-wellness/healthy-living/physical-activity/getting-started/walking-guide" target="_blank" rel="noopener"><div class="rc-top"><div class="rc-icon">🚶</div><span class="rc-type-badge">PDF Guide</span></div><div class="rc-title">Low-Impact Walking Program</div><div class="rc-desc">A 6-week progressive walking plan designed for joint comfort, with modifications for varying mobility levels.</div><div class="rc-foot"><span class="rc-date">Mar 2025</span><div class="rc-arrow">→</div></div></a><a class="resource-card cat-move" href="https://www.youtube.com/results?search_query=seated+strength+training+for+seniors" target="_blank" rel="noopener"><div class="rc-top"><div class="rc-icon">🪑</div><span class="rc-type-badge">Video</span></div><div class="rc-title">Seated Strength Training</div><div class="rc-desc">Three beginner-friendly routines from a chair, targeting the muscles that support the knee joint.</div><div class="rc-foot"><span class="rc-date">Feb 2025</span><div class="rc-arrow">→</div></div></a><a class="resource-card cat-move" href="https://www.arthritis.org" target="_blank" rel="noopener"><div class="rc-top"><div class="rc-icon">🧘</div><span class="rc-type-badge">External Link</span></div><div class="rc-title">Arthritis Foundation Exercise Resources</div><div class="rc-desc">Curated programs including aquatic and tai chi options for all fitness levels.</div><div class="rc-foot"><span class="rc-date">Jan 2025</span><div class="rc-arrow">→</div></div></a></div>
 </section>
 
