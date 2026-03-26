@@ -523,6 +523,7 @@
     .update-tag { display: none; }
     #announce-section { padding: 0 20px; }
     #setup-notice { margin: 0 20px 24px; }
+    }
   /* ── MATERIALS SECTION ──────────────────────────────────────── */
 
 #materials {
@@ -1508,7 +1509,7 @@ function fetchMaterials() {
           description: safeMatVal(c[1]),
           type:        safeMatVal(c[2]),
           topic:       safeMatVal(c[3]),
-          date:        safeMatVal(c[4]),
+          date:        date: (c[4] && c[4].v) ? (String(c[4].v).startsWith('Date(') ? (() => { const p = String(c[4].v).replace('Date(','').replace(')','').split(','); const d = new Date(parseInt(p[0]), parseInt(p[1]), parseInt(p[2])); return d.toLocaleString('default',{month:'short', year:'numeric'}); })() : String(c[4].v).trim()) : '',
           url:         safeMatVal(c[5]),
         };
       }).filter(m => m.title && m.url);
