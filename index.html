@@ -1509,7 +1509,7 @@ function fetchMaterials() {
           description: safeMatVal(c[1]),
           type:        safeMatVal(c[2]),
           topic:       safeMatVal(c[3]),
-          date:        date: (c[4] && c[4].v) ? (String(c[4].v).startsWith('Date(') ? (() => { const p = String(c[4].v).replace('Date(','').replace(')','').split(','); const d = new Date(parseInt(p[0]), parseInt(p[1]), parseInt(p[2])); return d.toLocaleString('default',{month:'short', year:'numeric'}); })() : String(c[4].v).trim()) : '',
+          date:        formatMatDate(c[4]),
           url:         safeMatVal(c[5]),
         };
       }).filter(m => m.title && m.url);
@@ -1524,7 +1524,18 @@ function fetchMaterials() {
       console.error('Materials fetch error:', err);
       showMatState('Could not load materials.', 'Please try refreshing the page.');
     });
-}function safeMatVal(cell) {
+}
+function formatMatDate(cell) {
+  if (!cell || cell.v === null || cell.v === undefined) return '';
+  const v = String(cell.v);
+  if (v.startsWith('Date(')) {
+    const p = v.replace('Date(','').replace(')','').split(',');
+    const d = new Date(parseInt(p[0]), parseInt(p[1]), parseInt(p[2]));
+    return d.toLocaleString('default', { month: 'short', year: 'numeric' });
+  }
+  return v.trim();
+}
+function safeMatVal(cell) {
   return (cell && cell.v !== null && cell.v !== undefined) ? String(cell.v).trim() : '';
 }
 function buildMatFilters() {
