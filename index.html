@@ -981,7 +981,9 @@ function populateAnnouncements(rows) {
     <div class="announce-item">
       <span class="announce-tag">${row['Tag'] || 'Update'}</span>
       <div>
-        <div class="announce-body"><strong>${row['Title'] || ''}</strong> ${row['Description'] || ''}</div>
+        <div class="announce-body"><strong>${row['Title'] || ''}</strong></div>
+        <div class="announce-body" style="margin-top:4px;">${row['Description'] || ''}</div>
+        ${row['URL'] ? `<a href="${row['URL']}" target="_blank" rel="noopener" style="display:inline-block; margin-top:8px; font-size:0.78rem; font-weight:600; color:var(--clay); text-decoration:none;">Register here →</a>` : ''}
         <div class="announce-date">${row['Date'] || ''}</div>
       </div>
     </div>`).join('');
