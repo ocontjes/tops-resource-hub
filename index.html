@@ -1047,7 +1047,8 @@ function populateUpdates(rows) {
 // ── Schedule ───────────────────────────────────────────────
 function populateSchedule(rows) {
   const list = document.getElementById('list-schedule');
-  if (!list) return;
+  if (!list) return;is 
+  
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -1106,6 +1107,11 @@ function populateSchedule(rows) {
       const notes    = (row['Notes'] || '').trim();
       const zoom     = (row['Zoom'] || '').trim().toLowerCase() === 'yes';
       const locStyle = LOCATION_STYLES[location.toLowerCase()] || null;
+      const DEFAULT_ADDRESSES = {
+  'chapel hill / durham': 'Binkley Baptist Church, 1712 Willow Dr, Chapel Hill, NC 27514',
+  'raleigh': 'Green Road Community Center, 4201 Green Rd, Raleigh, NC 27604',
+};
+const resolvedAddress = address || DEFAULT_ADDRESSES[location.toLowerCase()] || '';
 
       const locationTag = locStyle
         ? `<span style="background:${locStyle.bg}; color:${locStyle.color}; font-size:0.62rem; font-weight:700; letter-spacing:0.07em; text-transform:uppercase; padding:3px 10px; border-radius:100px; white-space:nowrap;">${location.toLowerCase() === 'all sites' ? '⭐ ' : ''}${location}</span>`
@@ -1127,7 +1133,7 @@ function populateSchedule(rows) {
           <div style="margin-top:12px;">
             ${title ? `<div class="schedule-title"><strong>${title}</strong></div>` : ''}
             ${time ? `<div class="schedule-time">🕐 ${time}</div>` : ''}
-            ${address ? `<div class="schedule-location" style="font-size:0.82rem; color:var(--ink-soft); margin-top:3px;">📍 ${address}</div>` : ''}
+            ${resolvedAddress ? `<div class="schedule-location" style="font-size:0.82rem; color:var(--ink-soft); margin-top:3px;">📍 ${resolvedAddress}</div>` : ''}
             ${notes ? `<div class="schedule-notes">${notes}</div>` : ''}
             ${zoom ? `<div style="font-size:0.68rem; color:var(--ink-soft); margin-top:4px; font-style:italic;">Virtual option available upon request</div>` : ''}
           </div>
