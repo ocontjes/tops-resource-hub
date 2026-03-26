@@ -1336,9 +1336,27 @@ function populateGrids(rows) {
           if (hidden.style.display === 'none') {
             hidden.style.display = 'contents';
             viewAllLink.textContent = 'Show less ←';
+            // add bottom collapse button
+            const collapseWrap = document.createElement('div');
+            collapseWrap.id = 'collapse-' + key;
+            collapseWrap.style.cssText = 'display:flex; align-items:center; gap:10px; margin-top:20px;';
+            collapseWrap.innerHTML = `
+              <div style="flex:1; height:1px; background:var(--sage-light);"></div>
+              <button style="font-family:\'DM Sans\',sans-serif; font-size:0.72rem; font-weight:500; color:var(--ink-soft); background:none; border:none; cursor:pointer; white-space:nowrap; padding:0;" 
+                onmouseover="this.style.color=\'var(--sage)\'" 
+                onmouseout="this.style.color=\'var(--ink-soft)\'">↑ show less</button>
+              <div style="flex:1; height:1px; background:var(--sage-light);"></div>`;
+            collapseWrap.querySelector('button').addEventListener('click', () => {
+              hidden.style.display = 'none';
+              viewAllLink.textContent = 'View all →';
+              collapseWrap.remove();
+            });
+            hidden.after(collapseWrap);
           } else {
             hidden.style.display = 'none';
             viewAllLink.textContent = 'View all →';
+            const collapseWrap = document.getElementById('collapse-' + key);
+            if (collapseWrap) collapseWrap.remove();
           }
         };
       }
