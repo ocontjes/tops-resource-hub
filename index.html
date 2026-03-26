@@ -1351,7 +1351,7 @@ function populateGrids(rows) {
               viewAllLink.textContent = 'View all →';
               collapseWrap.remove();
             });
-            hidden.after(collapseWrap);
+            grid.parentElement.insertBefore(collapseWrap, grid.nextSibling);
           } else {
             hidden.style.display = 'none';
             viewAllLink.textContent = 'View all →';
