@@ -1298,7 +1298,6 @@ function applyFilter(containerId, gridId, activeTag, bar) {
 }
 
 function populateGrids(rows) {
-  // Reset all view-all links before populating
   ['movement', 'nutrition', 'wellbeing'].forEach(key => {
     const link = document.querySelector(`#${key} .section-all`);
     if (link) {
@@ -1335,62 +1334,119 @@ function populateGrids(rows) {
       if (row['Tag 2'] && row['Tag 2'].trim()) tagSet.add(row['Tag 2'].trim());
     });
 
-    items.slice(0, 3).forEach(row => grid.insertAdjacentHTML('beforeend', renderResource(row)));
+    // Track current filter and expanded state per section
+    let activeFilter = null;
+    let isExpanded = false;
 
-    if (items.length > 3) {
-      const hiddenId = 'hidden-' + key;
-      const hiddenDiv = document.createElement('div');
-      hiddenDiv.id = hiddenId;
-      hiddenDiv.style.display = 'none';
-      hiddenDiv.classList.add('card-grid');
-      hiddenDiv.style.marginTop = '18px';
-      items.slice(3).forEach(row => hiddenDiv.insertAdjacentHTML('beforeend', renderResource(row)));
-      grid.appendChild(hiddenDiv);
+    function renderGrid(filterTag) {
+      // Remove old collapse button if present
+      const oldCollapse = document.getElementById('collapse-' + key);
+      if (oldCollapse) oldCollapse.remove();
+
+      const filtered = filterTag
+        ? items.filter(row => {
+            const t1 = (row['Tag 1'] || '').toLowerCase().trim();
+            const t2 = (row['Tag 2'] || '').toLowerCase().trim();
+            return t1 === filterTag.toLowerCase() || t2 === filterTag.toLowerCase();
+          })
+        : items;
+
+      const showAll = isExpanded || filterTag !== null;
+      const visible = showAll ? filtered : filtered.slice(0, 3);
+      const hasMore = !showAll && filtered.length > 3;
+
+      grid.innerHTML = visible.map(row => renderResource(row)).join('');
 
       const viewAllLink = document.querySelector(`#${key} .section-all`);
-      if (viewAllLink) {
-        viewAllLink.textContent = 'View all →';
-        viewAllLink.href = '#';
-        viewAllLink.onclick = (e) => {
-          e.preventDefault();
-          const hidden = document.getElementById(hiddenId);
-          if (!hidden) return;
-          if (hidden.style.display === 'none') {
-            hidden.style.display = 'contents';
-            viewAllLink.textContent = 'Show less ←';
-            // add bottom collapse button
+
+      if (hasMore) {
+        if (viewAllLink) {
+          viewAllLink.style.display = '';
+          viewAllLink.textContent = 'View all →';
+          viewAllLink.href = '#';
+          viewAllLink.onclick = (e) => {
+            e.preventDefault();
+            isExpanded = true;
+            renderGrid(activeFilter);
+
+            // Add bottom collapse button
             const collapseWrap = document.createElement('div');
             collapseWrap.id = 'collapse-' + key;
             collapseWrap.style.cssText = 'display:flex; align-items:center; gap:10px; margin-top:20px;';
             collapseWrap.innerHTML = `
               <div style="flex:1; height:1px; background:var(--sage-light);"></div>
-              <button style="font-family:\'DM Sans\',sans-serif; font-size:0.72rem; font-weight:500; color:var(--ink-soft); background:none; border:none; cursor:pointer; white-space:nowrap; padding:0;" 
-                onmouseover="this.style.color=\'var(--sage)\'" 
-                onmouseout="this.style.color=\'var(--ink-soft)\'">↑ show less</button>
+              <button style="font-family:'DM Sans',sans-serif; font-size:0.72rem; font-weight:500; color:var(--ink-soft); background:none; border:none; cursor:pointer; white-space:nowrap; padding:0;"
+                onmouseover="this.style.color='var(--sage)'"
+                onmouseout="this.style.color='var(--ink-soft)'">↑ show less</button>
               <div style="flex:1; height:1px; background:var(--sage-light);"></div>`;
             collapseWrap.querySelector('button').addEventListener('click', () => {
-              hidden.style.display = 'none';
-              viewAllLink.textContent = 'View all →';
-              collapseWrap.remove();
+              isExpanded = false;
+              renderGrid(activeFilter);
+              if (viewAllLink) viewAllLink.textContent = 'View all →';
             });
             grid.parentElement.insertBefore(collapseWrap, grid.nextSibling);
+
+            if (viewAllLink) viewAllLink.textContent = 'Show less ←';
+          };
+        }
+      } else {
+        if (viewAllLink) {
+          if (filtered.length <= 3) {
+            viewAllLink.style.display = 'none';
           } else {
-            hidden.style.display = 'none';
-            viewAllLink.textContent = 'View all →';
-            const collapseWrap = document.getElementById('collapse-' + key);
-            if (collapseWrap) collapseWrap.remove();
+            viewAllLink.style.display = '';
+            viewAllLink.textContent = isExpanded ? 'Show less ←' : 'View all →';
+            viewAllLink.href = '#';
+            viewAllLink.onclick = (e) => {
+              e.preventDefault();
+              isExpanded = !isExpanded;
+              renderGrid(activeFilter);
+            };
           }
-        };
-      }
-    } else {
-      const viewAllLink = document.querySelector(`#${key} .section-all`);
-      if (viewAllLink) {
-        viewAllLink.style.display = 'none';
-        viewAllLink.textContent = 'View all →';
+        }
       }
     }
+
+    // Initial render
+    renderGrid(null);
+
+    // Build filter bar
     if (tagSet.size > 1) {
-      renderFilterBar(key, [...tagSet], 'grid-' + key);
+      const existing = document.getElementById('filter-' + key);
+      if (existing) existing.remove();
+
+      const bar = document.createElement('div');
+      bar.className = 'filter-bar';
+      bar.id = 'filter-' + key;
+
+      const allBtn = document.createElement('button');
+      allBtn.className = 'filter-pill active';
+      allBtn.textContent = 'All';
+      allBtn.onclick = () => {
+        activeFilter = null;
+        isExpanded = false;
+        bar.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+        allBtn.classList.add('active');
+        renderGrid(null);
+      };
+      bar.appendChild(allBtn);
+
+      [...tagSet].forEach(tag => {
+        const btn = document.createElement('button');
+        btn.className = 'filter-pill';
+        btn.textContent = tag;
+        btn.onclick = () => {
+          activeFilter = tag;
+          isExpanded = false;
+          bar.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          renderGrid(tag);
+        };
+        bar.appendChild(btn);
+      });
+
+      const grid = document.getElementById('grid-' + key);
+      grid.parentElement.insertBefore(bar, grid);
     }
   });
 }
