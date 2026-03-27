@@ -1430,21 +1430,82 @@ function populateUpdates(rows) {
 }
 
 // ── Schedule ───────────────────────────────────────────────
+function buildScheduleRow(row) {
+  let dateStr = row['Date'] || '';
+  if (dateStr.startsWith('Date(')) {
+    const parts = dateStr.replace('Date(','').replace(')','').split(',');
+    dateStr = parts[0] + '-' + String(parseInt(parts[1])+1).padStart(2,'0') + '-' + String(parts[2]).padStart(2,'0');
+  }
+  const d        = new Date(dateStr + 'T12:00:00');
+  const month    = isNaN(d) ? '—' : d.toLocaleString('default', { month: 'short' }).toUpperCase();
+  const day      = isNaN(d) ? '—' : d.getDate();
+  const year     = isNaN(d) ? '' : d.getFullYear();
+  const location = (row['Location'] || '').trim();
+  const address  = (row['Address'] || '').trim();
+  const groups   = (row['Groups'] || '').trim();
+  const time     = (row['Time'] || '').trim();
+  const title    = (row['Title'] || '').trim();
+  const notes    = (row['Notes'] || '').trim();
+  const zoom     = (row['Zoom'] || '').trim().toLowerCase() === 'yes';
+  const LOCATION_STYLES = {
+    'chapel hill / durham': { bg: '#ddedf7', color: '#3a7ca5' },
+    'raleigh':              { bg: '#fde8e8', color: '#c0444d' },
+    'all sites':            { bg: '#fdecc8', color: '#9a6b1f' },
+    'virtual':              { bg: 'var(--plum-light)', color: 'var(--plum)' },
+  };
+  const DEFAULT_ADDRESSES = {
+    'chapel hill / durham': 'Binkley Baptist Church, 1712 Willow Dr, Chapel Hill, NC 27514',
+    'raleigh': 'Green Road Community Center, 4201 Green Rd, Raleigh, NC 27604',
+  };
+  const resolvedAddress = address || DEFAULT_ADDRESSES[location.toLowerCase()] || '';
+  const locStyle    = LOCATION_STYLES[location.toLowerCase()] || null;
+  const locationTag = locStyle
+    ? `<span style="background:${locStyle.bg}; color:${locStyle.color}; font-size:0.62rem; font-weight:700; letter-spacing:0.07em; text-transform:uppercase; padding:3px 10px; border-radius:100px; white-space:nowrap;">${location.toLowerCase() === 'all sites' ? '⭐ ' : ''}${location}</span>`
+    : '';
+  return `
+    <div class="schedule-row">
+      <div style="display:grid; grid-template-columns:90px 1fr; gap:20px; align-items:center;">
+        <div class="schedule-date-block">
+          <span class="sd-month">${month}</span>
+          <span class="sd-day">${day}</span>
+          <span class="sd-year">${year}</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          ${locationTag}
+          ${groups ? `<span style="font-size:0.82rem; font-weight:600; color:var(--ink-mid);">${groups}</span>` : ''}
+        </div>
+      </div>
+      <div style="margin-top:12px;">
+        ${title ? `<div class="schedule-title"><strong>${title}</strong></div>` : ''}
+        ${time ? `<div class="schedule-time">🕐 ${time}</div>` : ''}
+        ${resolvedAddress ? `<div class="schedule-location" style="font-size:0.82rem; color:var(--ink-soft); margin-top:3px;">📍 ${resolvedAddress}</div>` : ''}
+        ${notes ? `<div class="schedule-notes">${notes}</div>` : ''}
+        ${zoom ? `<div style="font-size:0.68rem; color:var(--ink-soft); margin-top:4px; font-style:italic;">Virtual option available upon request</div>` : ''}
+      </div>
+    </div>`;
+}
+
+function schedToggleExpand() {
+  const hidden = document.getElementById('sched-hidden');
+  const btn    = document.getElementById('sched-toggle-btn');
+  if (!hidden) return;
+  if (hidden.style.display === 'none') {
+    hidden.style.display = '';
+    btn.textContent = '↑ show less';
+  } else {
+    hidden.style.display = 'none';
+    const total = document.querySelectorAll('#sched-visible .schedule-row, #sched-hidden .schedule-row').length;
+    btn.textContent = `↓ show all ${total} events`;
+  }
+}
+
 function populateSchedule(rows) {
   const list = document.getElementById('list-schedule');
-  if (!list) return; 
-  
+  if (!list) return;
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const nextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 1);
-
-  const LOCATION_STYLES = {
-    'chapel hill / durham': { bg: '#ddedf7', color: '#3a7ca5' },
-    'raleigh':              { bg: '#fde8e8', color: '#c0444d' },
-    'all sites': { bg: '#fdecc8', color: '#9a6b1f' },
-    'virtual':              { bg: 'var(--plum-light)', color: 'var(--plum)' },
-  };
 
   const published = rows.filter(r => {
     if ((r['Status'] || '').toLowerCase() !== 'published') return false;
@@ -1470,61 +1531,31 @@ function populateSchedule(rows) {
     }
     return new Date(dateStrA + 'T12:00:00') - new Date(dateStrB + 'T12:00:00');
   });
-  
+
   if (published.length === 0) {
     list.innerHTML = '<div class="empty-state"><strong>No upcoming meetings</strong>Check back soon for scheduled dates.</div>';
-  } else {
-    list.innerHTML = published.map(row => {
-      let dateStr = row['Date'] || '';
-      if (dateStr.startsWith('Date(')) {
-        const parts = dateStr.replace('Date(','').replace(')','').split(',');
-        dateStr = parts[0] + '-' + String(parseInt(parts[1])+1).padStart(2,'0') + '-' + String(parts[2]).padStart(2,'0');
-      }
-      const d        = new Date(dateStr + 'T12:00:00');
-      const month    = isNaN(d) ? '—' : d.toLocaleString('default', { month: 'short' }).toUpperCase();
-      const day      = isNaN(d) ? '—' : d.getDate();
-      const year     = isNaN(d) ? '' : d.getFullYear();
-      const location = (row['Location'] || '').trim();
-      const address  = (row['Address'] || '').trim();
-      const groups   = (row['Groups'] || '').trim();
-      const time     = (row['Time'] || '').trim();
-      const title    = (row['Title'] || '').trim();
-      const notes    = (row['Notes'] || '').trim();
-      const zoom     = (row['Zoom'] || '').trim().toLowerCase() === 'yes';
-      const locStyle = LOCATION_STYLES[location.toLowerCase()] || null;
-      const DEFAULT_ADDRESSES = {
-  'chapel hill / durham': 'Binkley Baptist Church, 1712 Willow Dr, Chapel Hill, NC 27514',
-  'raleigh': 'Green Road Community Center, 4201 Green Rd, Raleigh, NC 27604',
-};
-const resolvedAddress = address || DEFAULT_ADDRESSES[location.toLowerCase()] || '';
-
-      const locationTag = locStyle
-        ? `<span style="background:${locStyle.bg}; color:${locStyle.color}; font-size:0.62rem; font-weight:700; letter-spacing:0.07em; text-transform:uppercase; padding:3px 10px; border-radius:100px; white-space:nowrap;">${location.toLowerCase() === 'all sites' ? '⭐ ' : ''}${location}</span>`
-        : '';
-
-      return `
-        <div class="schedule-row">
-          <div style="display:grid; grid-template-columns:90px 1fr; gap:20px; align-items:center;">
-            <div class="schedule-date-block">
-              <span class="sd-month">${month}</span>
-              <span class="sd-day">${day}</span>
-              <span class="sd-year">${year}</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-              ${locationTag}
-              ${groups ? `<span style="font-size:0.82rem; font-weight:600; color:var(--ink-mid);">${groups}</span>` : ''}
-            </div>
-          </div>
-          <div style="margin-top:12px;">
-            ${title ? `<div class="schedule-title"><strong>${title}</strong></div>` : ''}
-            ${time ? `<div class="schedule-time">🕐 ${time}</div>` : ''}
-            ${resolvedAddress ? `<div class="schedule-location" style="font-size:0.82rem; color:var(--ink-soft); margin-top:3px;">📍 ${resolvedAddress}</div>` : ''}
-            ${notes ? `<div class="schedule-notes">${notes}</div>` : ''}
-            ${zoom ? `<div style="font-size:0.68rem; color:var(--ink-soft); margin-top:4px; font-style:italic;">Virtual option available upon request</div>` : ''}
-          </div>
-        </div>`;
-    }).join('');
+    return;
   }
+
+  if (published.length <= 5) {
+    list.innerHTML = published.map(row => buildScheduleRow(row)).join('');
+    return;
+  }
+
+  const visibleHTML = published.slice(0, 5).map(row => buildScheduleRow(row)).join('');
+  const hiddenHTML  = published.slice(5).map(row => buildScheduleRow(row)).join('');
+
+  list.innerHTML = `
+    <div id="sched-visible" class="schedule-list">${visibleHTML}</div>
+    <div id="sched-hidden" class="schedule-list" style="display:none; margin-top:12px;">${hiddenHTML}</div>
+    <div id="sched-toggle-wrap" style="display:flex; align-items:center; gap:10px; margin-top:16px;">
+      <div style="flex:1; height:1px; background:var(--sage-light);"></div>
+      <button onclick="schedToggleExpand()" id="sched-toggle-btn"
+        style="font-family:'DM Sans',sans-serif; font-size:0.72rem; font-weight:500; color:var(--ink-soft); background:none; border:none; cursor:pointer; white-space:nowrap; padding:0;"
+        onmouseover="this.style.color='var(--sage)'"
+        onmouseout="this.style.color='var(--ink-soft)'">↓ show all ${published.length} events</button>
+      <div style="flex:1; height:1px; background:var(--sage-light);"></div>
+    </div>`;
 }
 
 // ── Demo fallback ──────────────────────────────────────────
