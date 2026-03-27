@@ -1150,7 +1150,19 @@ function getCat(raw) {
 }
 
 // ── Type icons ─────────────────────────────────────────────
-function getTypeIcon(type) {
+function getTagIcon(tag) {
+  if (tag === 'strength & fitness')               return '💪';
+  if (tag === 'low-impact movement')              return '🧘';
+  if (tag === 'cardio')                           return '🏃';
+  if (tag === 'walking trails & resources')       return '👟';
+  if (tag === 'healthy recipes & meal prep')      return '👩‍🍳';
+  if (tag === 'dietary guides & recommendations') return '🥦';
+  if (tag === 'mindful eating')                   return '🍽️';
+  if (tag === 'heart health')                     return '❤️';
+  if (tag === 'weight management')                return '⚖️';
+  return null;
+}
+  function getTypeIcon(type) {
   const t = (type || '').toLowerCase();
   if (t.includes('video'))                       return '▶️';
   if (t.includes('pdf'))                         return '📄';
@@ -1210,15 +1222,16 @@ if (rawDate.startsWith('Date(')) {
   const d = new Date(parseInt(parts[0]), parseInt(parts[1]), parseInt(parts[2]));
   date = 'Added: ' + d.toLocaleString('default', { month: 'short', year: 'numeric' });
 }
-  const type   = row['Type'] || 'Resource';
+  const type    = row['Type'] || 'Resource';
   const tag1   = (row['Tag 1'] || '').trim();
+  const tag1key = tag1.toLowerCase().trim();
   const tag2   = (row['Tag 2'] || '').trim();
   const tagPills = [getTagPill(tag1), getTagPill(tag2)].filter(Boolean).join(' ');
 
   return `
     <a class="resource-card ${cfg.cls}" href="${url}" target="_blank" rel="noopener" data-tag1="${tag1}" data-tag2="${tag2}">
       <div class="rc-top">
-        <div class="rc-icon">${getTypeIcon(type)}</div>
+        <div class="rc-icon">${getTagIcon(tag1key) || getTypeIcon(type)}</div>
         <span class="rc-type-badge">${type}</span>
       </div>
       <div class="rc-title">${row['Title'] || 'Untitled'}</div>
