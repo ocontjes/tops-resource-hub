@@ -1250,54 +1250,6 @@ if (rawDate.startsWith('Date(')) {
 }
 
 // ── Populate grids ─────────────────────────────────────────
-function renderFilterBar(containerId, tags, gridId) {
-  const existing = document.getElementById('filter-' + containerId);
-  if (existing) existing.remove();
-
-  const bar = document.createElement('div');
-  bar.className = 'filter-bar';
-  bar.id = 'filter-' + containerId;
-
-  const allBtn = document.createElement('button');
-  allBtn.className = 'filter-pill active';
-  allBtn.textContent = 'All';
-  allBtn.onclick = () => applyFilter(containerId, gridId, null, bar);
-  bar.appendChild(allBtn);
-
-  tags.forEach(tag => {
-    const btn = document.createElement('button');
-    btn.className = 'filter-pill';
-    btn.textContent = tag;
-    btn.onclick = () => applyFilter(containerId, gridId, tag, bar);
-    bar.appendChild(btn);
-  });
-
-  const grid = document.getElementById(gridId);
-  grid.parentElement.insertBefore(bar, grid);
-}
-
-function applyFilter(containerId, gridId, activeTag, bar) {
-  // Update active pill
-  bar.querySelectorAll('.filter-pill').forEach(btn => {
-    btn.classList.toggle('active',
-      activeTag === null ? btn.textContent === 'All' : btn.textContent === activeTag
-    );
-  });
-
-  // Show/hide cards
-  const grid = document.getElementById(gridId);
-  const cards = grid.querySelectorAll('.resource-card');
-  cards.forEach(card => {
-    if (!activeTag) {
-      card.style.display = '';
-      return;
-    }
-    const tag1 = (card.dataset.tag1 || '').toLowerCase().trim();
-    const tag2 = (card.dataset.tag2 || '').toLowerCase().trim();
-    const match = tag1 === activeTag.toLowerCase() || tag2 === activeTag.toLowerCase();
-    card.style.display = match ? '' : 'none';
-  });
-}
 
 function populateGrids(rows) {
   ['movement', 'nutrition', 'wellbeing'].forEach(key => {
