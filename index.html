@@ -1254,11 +1254,7 @@ if (rawDate.startsWith('Date(')) {
 function populateGrids(rows) {
   ['movement', 'nutrition', 'wellbeing'].forEach(key => {
     const link = document.querySelector(`#${key} .section-all`);
-    if (link) {
-      link.style.display = '';
-      link.textContent = 'View all →';
-      link.onclick = null;
-    }
+    if (link) { link.style.display = ''; link.textContent = 'View all →'; link.onclick = null; }
   });
 
   const published = rows.filter(r => (r['Status'] || '').toLowerCase() === 'published');
@@ -1288,12 +1284,10 @@ function populateGrids(rows) {
       if (row['Tag 2'] && row['Tag 2'].trim()) tagSet.add(row['Tag 2'].trim());
     });
 
-    // Track current filter and expanded state per section
     let activeFilter = null;
     let isExpanded = false;
 
     function renderGrid(filterTag) {
-      // Remove old collapse button if present
       const oldCollapse = document.getElementById('collapse-' + key);
       if (oldCollapse) oldCollapse.remove();
 
@@ -1322,8 +1316,6 @@ function populateGrids(rows) {
             e.preventDefault();
             isExpanded = true;
             renderGrid(activeFilter);
-
-            // Add bottom collapse button
             const collapseWrap = document.createElement('div');
             collapseWrap.id = 'collapse-' + key;
             collapseWrap.style.cssText = 'display:flex; align-items:center; gap:10px; margin-top:20px;';
@@ -1339,7 +1331,6 @@ function populateGrids(rows) {
               if (viewAllLink) viewAllLink.textContent = 'View all →';
             });
             grid.parentElement.insertBefore(collapseWrap, grid.nextSibling);
-
             if (viewAllLink) viewAllLink.textContent = 'Show less ←';
           };
         }
@@ -1361,10 +1352,7 @@ function populateGrids(rows) {
       }
     }
 
-    // Initial render
-    renderGrid(null);
-
-    // Build filter bar
+    // Build filter bar first
     if (tagSet.size > 1) {
       const existing = document.getElementById('filter-' + key);
       if (existing) existing.remove();
@@ -1399,9 +1387,12 @@ function populateGrids(rows) {
         bar.appendChild(btn);
       });
 
-      const grid = document.getElementById('grid-' + key);
-      grid.parentElement.insertBefore(bar, grid);
+      const gridEl = document.getElementById('grid-' + key);
+      gridEl.parentElement.insertBefore(bar, gridEl);
     }
+
+    // Initial render after filter bar is in DOM
+    renderGrid(null);
   });
 }
 // ── Announcements ──────────────────────────────────────────
