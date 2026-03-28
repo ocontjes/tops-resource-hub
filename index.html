@@ -1160,7 +1160,6 @@ function getTagIcon(tag) {
   if (tag === 'mindful eating')                   return '🍽️';
   if (tag === 'heart health')                     return '❤️';
   if (tag === 'weight management')           return '⚖️';
-  if (tag === 'find a provider')             return '🔍';
   return null;
 }
   function getTypeIcon(type) {
@@ -1176,6 +1175,7 @@ function getTagIcon(tag) {
   if (t.includes('nutrition guide'))             return '🥗';
   if (t.includes('infographic'))                 return '📊';
   if (t.includes('tool') || t.includes('app'))  return '📱';
+  if (t.includes('find a provider'))             return '🔍';
   if (t.includes('website'))                     return '🌐';
   if (t.includes('support group'))                return '👥';  
   return '📌'
@@ -1203,7 +1203,6 @@ const TAG_COLORS = {
   'sleep':                         'background:#f0edf8;color:#7b6aaa',
   // General — slate
   'substance use & recovery':  'background:#f0f0f0;color:#4a5550',
-  'find a provider':           'background:#f0f0f0;color:#4a5550',
 };
 
 function getTagPill(tag) {
