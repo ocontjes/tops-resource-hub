@@ -1468,6 +1468,7 @@ function buildScheduleRow(row) {
   const title    = (row['Title'] || '').trim();
   const notes    = (row['Notes'] || '').trim();
   const zoom     = (row['Zoom'] || '').trim().toLowerCase() === 'yes';
+  const url      = (row['URL'] || '').trim();
   const LOCATION_STYLES = {
     'chapel hill / durham': { bg: '#ddedf7', color: '#3a7ca5' },
     'raleigh':              { bg: '#fde8e8', color: '#c0444d' },
@@ -1502,6 +1503,7 @@ function buildScheduleRow(row) {
         ${resolvedAddress ? `<div class="schedule-location" style="font-size:0.82rem; color:var(--ink-soft); margin-top:3px; margin-bottom:8px;">📍 ${resolvedAddress}</div>` : ''}
         ${notes ? `<div class="schedule-notes">${notes}</div>` : ''}
         ${zoom ? `<div style="font-size:0.68rem; color:var(--ink-soft); margin-top:4px; font-style:italic;">Virtual option available upon request</div>` : ''}
+${url ? `<a href="${url}" target="_blank" rel="noopener" style="display:inline-block; margin-top:8px; font-size:0.78rem; font-weight:600; color:var(--sage); text-decoration:none;">Register here →</a>` : ''}
       </div>
     </div>`;
 }
