@@ -1361,7 +1361,8 @@ function populateGrids(rows) {
 
       const allBtn = document.createElement('button');
       allBtn.className = 'filter-pill active';
-      allBtn.textContent = 'All';
+allBtn.style.cssText = 'font-size:0.68rem; opacity:0.7;';
+      allBtn.textContent = 'Clear';
       allBtn.onclick = () => {
         activeFilter = null;
         isExpanded = false;
