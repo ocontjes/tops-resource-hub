@@ -1119,7 +1119,7 @@ function fetchSheet(gid) {
           .map(r => {
             const obj = {};
             cols.forEach((col, i) => {
-              obj[col] = (r.c[i] && r.c[i].v != null) ? String(r.c[i].v).trim() : '';
+              obj[col] = (r.c[i] && r.c[i].v != null) ? String(r.c[i].v).trim().replace(/^"|"$/g, '') : '';
             });
             return obj;
           });
